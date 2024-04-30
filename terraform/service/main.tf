@@ -11,23 +11,27 @@ data "aws_region" "current" {}
 data "aws_ecs_service" "current_service" {
   count        = var.bootstrap ? 0 : 1
   cluster_arn  = var.cluster_arn
-  service_name = var.service_name
+  service_name = var.app_name
 }
 
 data "aws_ecs_container_definition" "current_container_definition" {
   count           = var.bootstrap ? 0 : 1
   task_definition = data.aws_ecs_service.current_service[0].task_definition
-  container_name  = var.service_name
+  container_name  = var.app_name
 }
 
+# Manually manage the secret as an env file in AWS Secrets Manager UI
+resource "aws_secretsmanager_secret" "secrets" {
+  name = "${var.app_name}-secrets"
+}
 # Service
 resource "aws_ecr_repository" "image_repository" {
-  name                 = var.service_name
+  name                 = var.app_name
   image_tag_mutability = "MUTABLE"
 }
 
 resource "aws_cloudwatch_log_group" "default" {
-  name              = var.service_name
+  name              = var.app_name
   retention_in_days = 365
 }
 resource "aws_alb_listener" "alb_listener_http" {
@@ -42,35 +46,6 @@ resource "aws_alb_listener" "alb_listener_http" {
   }
 }
 
-# resource "aws_alb_listener" "alb_listener_https" {
-#   load_balancer_arn = var.load_balancer_arn
-
-#   port     = 443
-#   protocol = "HTTPS"
-
-#   default_action {
-#     target_group_arn = aws_lb_target_group.target_group.arn
-#     type             = "forward"
-#   }
-# }
-
-# resource "aws_lb_listener_rule" "alb_listener_rule_https" {
-#   listener_arn = aws_alb_listener.alb_listener_https.arn
-
-#   action {
-#     target_group_arn = aws_lb_target_group.target_group.arn
-#     type             = "forward"
-#   }
-
-#   condition {
-#     path_pattern {
-#       values = [
-#         "/${var.service_name}/*"
-#       ]
-#     }
-#   }
-# }
-
 resource "aws_lb_listener_rule" "alb_listener_rule_http" {
   listener_arn = aws_alb_listener.alb_listener_http.arn
 
@@ -80,16 +55,14 @@ resource "aws_lb_listener_rule" "alb_listener_rule_http" {
   }
 
   condition {
-    path_pattern {
-      values = [
-        "/${var.service_name}/*"
-      ]
+    host_header {
+      values = [var.app_domain]
     }
   }
 }
 
 resource "aws_lb_target_group" "target_group" {
-  name                 = var.service_name
+  name                 = var.app_name
   port                 = 80
   protocol             = "HTTP"
   target_type          = "ip"
@@ -107,7 +80,7 @@ resource "aws_lb_target_group" "target_group" {
 }
 
 resource "aws_ecs_service" "service" {
-  name            = var.service_name
+  name            = var.app_name
   cluster         = var.cluster_arn
   task_definition = aws_ecs_task_definition.task_definition.arn
   desired_count   = 1
@@ -125,7 +98,7 @@ resource "aws_ecs_service" "service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.target_group.arn
-    container_name   = "service"
+    container_name   = var.app_name
     container_port   = 80
   }
 
@@ -136,27 +109,32 @@ resource "aws_ecs_service" "service" {
 }
 
 resource "aws_ecs_task_definition" "task_definition" {
-  family       = var.service_name
-  network_mode = "awsvpc"
+  family             = var.app_name
+  network_mode       = "awsvpc"
+  execution_role_arn = aws_iam_role.task_execution_role.arn
+  task_role_arn      = aws_iam_role.task_role.arn
 
   container_definitions = jsonencode([
     {
-      name             = "service"
-      taskRoleArn      = aws_iam_role.task_role.arn
-      executionRoleArn = aws_iam_role.task_execution_role.arn
-      image            = local.image
-      memory           = 200
-      essential        = true
-      portMappings = [
-        {
-          containerPort = 80
-          hostPort      = 80
-        }
-      ]
+      name      = var.app_name
+      image     = local.image
+      memory    = 200
+      essential = true
+      secrets = [{
+        name      = "AWS_SECRETS_STRING",
+        valueFrom = aws_secretsmanager_secret.secrets.arn
+      }]
+      portMappings = [{
+        containerPort = 80
+      }]
+      environment = [{
+        name  = "PORT",
+        value = "80"
+      }],
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = var.service_name
+          awslogs-group         = var.app_name
           awslogs-region        = data.aws_region.current.name
           awslogs-stream-prefix = "ecs"
         }

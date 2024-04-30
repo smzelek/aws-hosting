@@ -22,7 +22,7 @@ resource "aws_route" "internet_access" {
 
 resource "aws_subnet" "public_1" {
   vpc_id                  = aws_vpc.default.id
-  availability_zone       = "us-east-1c"
+  availability_zone       = "us-east-1d"
   cidr_block              = cidrsubnet(local.base_cidr, 8, 0)
   map_public_ip_on_launch = true
   tags = {
@@ -30,56 +30,48 @@ resource "aws_subnet" "public_1" {
   }
 }
 
-resource "aws_subnet" "public_2" {
+resource "aws_subnet" "private_1" {
   vpc_id                  = aws_vpc.default.id
   availability_zone       = "us-east-1d"
   cidr_block              = cidrsubnet(local.base_cidr, 8, 1)
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "private-1"
+  }
+}
+
+resource "aws_subnet" "public_2" {
+  vpc_id                  = aws_vpc.default.id
+  availability_zone       = "us-east-1c"
+  cidr_block              = cidrsubnet(local.base_cidr, 8, 2)
   map_public_ip_on_launch = true
   tags = {
     Name = "public-2"
   }
 }
 
-# resource "aws_vpn_gateway" "vpn" {
-#   vpc_id = aws_vpc.default.id
-# }
+resource "aws_route_table_association" "private_route_table_association" {
+  subnet_id      = aws_subnet.private_1.id
+  route_table_id = aws_route_table.private_route_table.id
+}
 
-# resource "aws_eip" "nat" {
-#   vpc        = true
-#   depends_on = [aws_internet_gateway.default]
-# }
+resource "aws_route_table" "private_route_table" {
+  vpc_id = aws_vpc.default.id
 
-# resource "aws_nat_gateway" "gw" {
-#   allocation_id = aws_eip.nat.id
-#   subnet_id     = aws_subnet.public_1.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_nat_gateway.nat_gateway.id
+  }
+}
 
-#   depends_on = [aws_internet_gateway.default]
-# }
+resource "aws_eip" "nat_eip" {
+  domain = "vpc"
+}
 
-# resource "aws_subnet" "private" {
-#   vpc_id            = aws_vpc.default.id
-#   availability_zone = "us-east-1d"
-#   cidr_block        = "10.1.128.0/24"
-#   tags = {
-#     Name = "private"
-#   }
-# }
-
-# resource "aws_route_table" "private" {
-#   vpc_id           = aws_vpc.default.id
-#   propagating_vgws = [aws_vpn_gateway.vpn.id]
-# }
-
-# resource "aws_route" "private" {
-#   route_table_id         = aws_route_table.private.id
-#   destination_cidr_block = "0.0.0.0/0"
-#   nat_gateway_id         = aws_nat_gateway.gw.id
-# }
-
-# resource "aws_route_table_association" "private" {
-#   subnet_id      = aws_subnet.private.id
-#   route_table_id = aws_route_table.private.id
-# }
+resource "aws_nat_gateway" "nat_gateway" {
+  allocation_id = aws_eip.nat_eip.id
+  subnet_id     = aws_subnet.public_1.id
+}
 
 resource "aws_security_group" "open_internet" {
   vpc_id = aws_vpc.default.id

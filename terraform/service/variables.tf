@@ -1,4 +1,4 @@
-variable "service_name" {
+variable "app_name" {
   type = string
 }
 
@@ -24,6 +24,14 @@ variable "subnet_ids" {
 
 variable "security_group_ids" {
   type = list(string)
+}
+
+variable "github_repo" {
+  type = string
+}
+
+variable "app_domain" {
+  type = string
 }
 
 variable "bootstrap" {

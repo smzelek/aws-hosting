@@ -24,7 +24,7 @@ resource "aws_autoscaling_group" "autoscaling_group" {
   name                = "autoscaling_group"
   min_size            = 0
   max_size            = 1
-  vpc_zone_identifier = [aws_subnet.public_1.id]
+  vpc_zone_identifier = [aws_subnet.private_1.id]
 
 
   launch_template {
@@ -44,8 +44,9 @@ resource "aws_autoscaling_group" "autoscaling_group" {
 }
 
 resource "aws_launch_template" "cluster_instance_template" {
-  name_prefix            = "cluster_instance"
-  image_id               = "ami-0046cbbe25829d3a8" # aws --profile kerukion-admin ssm get-parameters --names /aws/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended/image_id
+  name_prefix = "cluster_instance"
+  # image_id = aws --profile kerukion-admin ssm get-parameters --names /aws/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended/image_id
+  image_id               = "ami-0046cbbe25829d3a8"
   instance_type          = "t4g.small"
   update_default_version = true
   vpc_security_group_ids = [aws_security_group.open_internet.id]

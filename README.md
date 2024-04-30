@@ -29,7 +29,6 @@ aws --profile kerukion-admin ssm start-session --target i-0ce55fd178fc85fe9
 TOKEN=`curl --no-progress-meter -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` && curl --no-progress-meter -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/iam/info && echo
 ```
 
-
 ## Build and push docker default-image
 ```bash
 ECR_URL="590184101838.dkr.ecr.us-east-1.amazonaws.com" \
