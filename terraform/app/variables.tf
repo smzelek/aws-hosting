@@ -34,6 +34,10 @@ variable "app_domain" {
   type = string
 }
 
+variable "app_frontend_domain" {
+  type = string
+}
+
 variable "bootstrap" {
   default = false
   type    = bool

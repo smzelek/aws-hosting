@@ -51,7 +51,7 @@ resource "aws_iam_role_policy" "github_role_policy" {
           "ecs:DescribeTaskDefinition",
           "ecr:GetAuthorizationToken"
         ],
-        Resource = "*"
+        Resource = ["*"]
       },
       {
         Effect = "Allow",
@@ -95,7 +95,14 @@ resource "aws_iam_role_policy" "github_role_policy" {
         Resource = [
           "${aws_ecr_repository.image_repository.arn}"
         ]
-      }
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:PutObject",
+        ],
+        Resource = ["${aws_s3_bucket.default.arn}/*"]
+      },
     ]
   })
 }

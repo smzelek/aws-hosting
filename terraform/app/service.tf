@@ -22,12 +22,14 @@ data "aws_ecs_container_definition" "current_container_definition" {
 
 # Manually manage the secret as an env file in AWS Secrets Manager UI
 resource "aws_secretsmanager_secret" "secrets" {
-  name = "${var.app_name}-secrets"
+  name                    = "${var.app_name}-secrets"
+  recovery_window_in_days = 0
 }
 # Service
 resource "aws_ecr_repository" "image_repository" {
   name                 = var.app_name
   image_tag_mutability = "MUTABLE"
+  force_delete         = true
 }
 
 resource "aws_cloudwatch_log_group" "default" {
@@ -113,6 +115,8 @@ resource "aws_ecs_task_definition" "task_definition" {
   network_mode       = "awsvpc"
   execution_role_arn = aws_iam_role.task_execution_role.arn
   task_role_arn      = aws_iam_role.task_role.arn
+
+  track_latest = true
 
   container_definitions = jsonencode([
     {
