@@ -1,0 +1,498 @@
+{
+    "widgets": [
+        {
+            "height": 8,
+            "width": 7,
+            "y": 2,
+            "x": 7,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/AutoScaling",
+                        "GroupInServiceInstances",
+                        "AutoScalingGroupName",
+                        "${template_asg}",
+                        {
+                            "color": "#2ca02c",
+                            "region": "us-east-1",
+                            "label": "InService"
+                        }
+                    ],
+                    [
+                        ".",
+                        "GroupPendingInstances",
+                        ".",
+                        ".",
+                        {
+                            "color": "#ffbb78",
+                            "region": "us-east-1",
+                            "label": "Pending"
+                        }
+                    ],
+                    [
+                        ".",
+                        "GroupTerminatingInstances",
+                        ".",
+                        ".",
+                        {
+                            "color": "#d62728",
+                            "region": "us-east-1",
+                            "label": "Terminating"
+                        }
+                    ],
+                    [
+                        ".",
+                        "GroupStandbyInstances",
+                        ".",
+                        ".",
+                        {
+                            "color": "#c7c7c7",
+                            "region": "us-east-1",
+                            "label": "Standby"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-east-1",
+                "stat": "Average",
+                "period": 300,
+                "yAxis": {
+                    "left": {
+                        "showUnits": false
+                    }
+                },
+                "title": "ASG Instance Status"
+            }
+        },
+        {
+            "height": 4,
+            "width": 7,
+            "y": 2,
+            "x": 14,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/AutoScaling",
+                        "GroupMinSize",
+                        "AutoScalingGroupName",
+                        "${template_asg}",
+                        {
+                            "region": "us-east-1",
+                            "label": "Min"
+                        }
+                    ],
+                    [
+                        ".",
+                        "GroupMaxSize",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-east-1",
+                            "label": "Max"
+                        }
+                    ]
+                ],
+                "view": "singleValue",
+                "stacked": false,
+                "region": "us-east-1",
+                "period": 300,
+                "stat": "Average",
+                "start": "-PT5M",
+                "end": "P0D",
+                "title": "ASG Capacity Rules",
+                "liveData": true
+            }
+        },
+        {
+            "height": 4,
+            "width": 7,
+            "y": 6,
+            "x": 14,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/AutoScaling",
+                        "GroupInServiceInstances",
+                        "AutoScalingGroupName",
+                        "${template_asg}",
+                        {
+                            "region": "us-east-1",
+                            "label": "InService",
+                            "color": "#2ca02c"
+                        }
+                    ],
+                    [
+                        ".",
+                        "GroupDesiredCapacity",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-east-1",
+                            "label": "Desired",
+                            "color": "#e377c2"
+                        }
+                    ]
+                ],
+                "view": "singleValue",
+                "stacked": false,
+                "region": "us-east-1",
+                "period": 300,
+                "stat": "Average",
+                "start": "-PT5M",
+                "end": "P0D",
+                "liveData": true
+            }
+        },
+        {
+            "height": 8,
+            "width": 7,
+            "y": 2,
+            "x": 0,
+            "type": "metric",
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [
+                        "AWS/ECS",
+                        "CPUUtilization",
+                        "ClusterName",
+                        "${template_cluster}",
+                        {
+                            "region": "us-east-1"
+                        }
+                    ],
+                    [
+                        ".",
+                        "MemoryUtilization",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-east-1"
+                        }
+                    ]
+                ],
+                "region": "us-east-1",
+                "period": 300,
+                "yAxis": {
+                    "left": {
+                        "max": 100
+                    }
+                },
+                "annotations": {
+                    "horizontal": [
+                        {
+                            "label": "SLA",
+                            "value": 90,
+                            "fill": "above"
+                        }
+                    ],
+                    "vertical": [
+                        {
+                            "visible": false,
+                            "label": "Untitled annotation",
+                            "value": "2024-05-01T14:42:04.000Z"
+                        }
+                    ]
+                },
+                "title": "ASG Instance Utilization"
+            }
+        },
+        {
+            "height": 2,
+            "width": 21,
+            "y": 0,
+            "x": 0,
+            "type": "text",
+            "properties": {
+                "markdown": "# []()\n# Cluster ASG Metrics",
+                "background": "transparent"
+            }
+        },
+        {
+            "height": 2,
+            "width": 21,
+            "y": 10,
+            "x": 0,
+            "type": "text",
+            "properties": {
+                "markdown": "# []()\n# App Metrics",
+                "background": "transparent"
+            }
+        },
+        {
+            "height": 8,
+            "width": 7,
+            "y": 12,
+            "x": 0,
+            "type": "metric",
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [
+                        "AWS/ECS",
+                        "CPUUtilization",
+                        "ServiceName",
+                        "${template_service}",
+                        "ClusterName",
+                        "${template_cluster}",
+                        {
+                            "region": "us-east-1"
+                        }
+                    ],
+                    [
+                        ".",
+                        "MemoryUtilization",
+                        ".",
+                        ".",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-east-1"
+                        }
+                    ]
+                ],
+                "region": "us-east-1",
+                "yAxis": {
+                    "left": {
+                        "max": 100,
+                        "min": 0
+                    }
+                },
+                "title": "Service Task Utilization",
+                "period": 300,
+                "annotations": {
+                    "horizontal": [
+                        {
+                            "label": "SLA",
+                            "value": 90,
+                            "fill": "above"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "height": 8,
+            "width": 7,
+            "y": 12,
+            "x": 7,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [
+                        "ECS/ContainerInsights",
+                        "RunningTaskCount",
+                        "ServiceName",
+                        "${template_service}",
+                        "ClusterName",
+                        "${template_cluster}",
+                        {
+                            "region": "us-east-1",
+                            "label": "Running"
+                        }
+                    ],
+                    [
+                        ".",
+                        "PendingTaskCount",
+                        ".",
+                        ".",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-east-1",
+                            "label": "Pending",
+                            "color": "#ffbb78"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-east-1",
+                "period": 300,
+                "stat": "Average",
+                "title": "Task Status"
+            }
+        },
+        {
+            "height": 8,
+            "width": 7,
+            "y": 12,
+            "x": 14,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/ApplicationELB",
+                        "HealthyHostCount",
+                        "TargetGroup",
+                        "${template_target_group}",
+                        "LoadBalancer",
+                        "${template_lb}",
+                        {
+                            "region": "us-east-1",
+                            "color": "#2ca02c",
+                            "label": "Healthy"
+                        }
+                    ],
+                    [
+                        ".",
+                        "UnHealthyHostCount",
+                        ".",
+                        ".",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-east-1",
+                            "color": "#d62728",
+                            "label": "Unhealthy"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-east-1",
+                "period": 300,
+                "stat": "Average",
+                "title": "Target Group Status"
+            }
+        },
+        {
+            "height": 2,
+            "width": 21,
+            "y": 28,
+            "x": 0,
+            "type": "text",
+            "properties": {
+                "markdown": "# []()\n# []()",
+                "background": "transparent"
+            }
+        },
+        {
+            "height": 8,
+            "width": 7,
+            "y": 20,
+            "x": 0,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/ApplicationELB",
+                        "RequestCount",
+                        "TargetGroup",
+                        "${template_target_group}",
+                        "LoadBalancer",
+                        "${template_lb}",
+                        {
+                            "label": "NumRequests",
+                            "color": "#1f77b4",
+                            "region": "us-east-1"
+                        }
+                    ],
+                    [
+                        ".",
+                        "HTTPCode_Target_2XX_Count",
+                        ".",
+                        ".",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-east-1",
+                            "label": "2XX",
+                            "color": "#2ca02c"
+                        }
+                    ],
+                    [
+                        ".",
+                        "HTTPCode_Target_3XX_Count",
+                        ".",
+                        ".",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-east-1",
+                            "label": "3XX",
+                            "color": "#ffbb78"
+                        }
+                    ],
+                    [
+                        ".",
+                        "HTTPCode_Target_4XX_Count",
+                        ".",
+                        ".",
+                        ".",
+                        ".",
+                        {
+                            "region": "us-east-1",
+                            "label": "4XX"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-east-1",
+                "stat": "Average",
+                "period": 300,
+                "title": "API Requests"
+            }
+        },
+        {
+            "height": 8,
+            "width": 7,
+            "y": 20,
+            "x": 7,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [
+                        "AWS/ApplicationELB",
+                        "TargetResponseTime",
+                        "TargetGroup",
+                        "${template_target_group}",
+                        "LoadBalancer",
+                        "${template_lb}",
+                        {
+                            "label": "Response Time (s)"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-east-1",
+                "stat": "Average",
+                "period": 300,
+                "yAxis": {
+                    "left": {
+                        "label": "",
+                        "showUnits": true,
+                        "min": 0,
+                        "max": 1
+                    },
+                    "right": {
+                        "showUnits": false
+                    }
+                },
+                "title": "API Response Time"
+            }
+        },
+        {
+            "height": 8,
+            "width": 10,
+            "y": 20,
+            "x": 14,
+            "type": "log",
+            "properties": {
+                "query": "SOURCE '${template_log_group}' \n | fields @timestamp, @message \n | sort @timestamp desc \n | limit 100",
+                "region": "us-east-1",
+                "stacked": false,
+                "view": "table",
+                "title": "Latest API Logs"
+            }
+        }
+    ]
+}

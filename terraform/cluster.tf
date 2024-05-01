@@ -1,6 +1,12 @@
 resource "aws_ecs_cluster" "cluster" {
   name = "cluster"
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
 }
+
 resource "aws_ecs_cluster_capacity_providers" "cluster_capacity_providers" {
   cluster_name       = aws_ecs_cluster.cluster.name
   capacity_providers = [aws_ecs_capacity_provider.autoscaling_provider.name]
@@ -25,7 +31,16 @@ resource "aws_autoscaling_group" "autoscaling_group" {
   min_size            = 0
   max_size            = 1
   vpc_zone_identifier = [aws_subnet.private_1.id]
-
+  enabled_metrics = [
+    "GroupMinSize",
+    "GroupMaxSize",
+    "GroupDesiredCapacity",
+    "GroupInServiceInstances",
+    "GroupPendingInstances",
+    "GroupStandbyInstances",
+    "GroupTerminatingInstances",
+    "GroupTotalInstances",
+  ]
 
   launch_template {
     id      = aws_launch_template.cluster_instance_template.id

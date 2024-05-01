@@ -6,11 +6,23 @@ variable "cluster_arn" {
   type = string
 }
 
+variable "cluster_name" {
+  type = string
+}
+
+variable "autoscaling_group_name" {
+  type = string
+}
+
 variable "vpc_id" {
   type = string
 }
 
 variable "load_balancer_arn" {
+  type = string
+}
+
+variable "load_balancer_arn_suffix" {
   type = string
 }
 
