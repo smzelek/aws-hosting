@@ -20,21 +20,30 @@ locals {
     #   bootstrap   = false
     # },
     {
-      app_name    = "guildvaults-com"
-      github_repo = "smzelek/guildvaults.com"
-      app_domain  = "guildvaults.com"
-      api_domain  = "api.guildvaults.com"
-      bootstrap   = false
+      app_name     = "guildvaults-com"
+      github_repo  = "smzelek/guildvaults.com"
+      app_domain   = "guildvaults.com"
+      api_domain   = "api.guildvaults.com"
+      subdomain_of = ""
+      bootstrap    = false
+    },
+    {
+      app_name     = "tic-metac-toe"
+      github_repo  = "smzelek/tic-metac-toe"
+      app_domain   = "tic-metac-toe"
+      api_domain   = "tic-metac-toe-api"
+      subdomain_of = "stevezelek.com"
+      bootstrap    = true
     },
   ]
 
   static_apps = [
-    # {
-    #   app_name     = "pokegrader"
-    #   github_repo  = "smzelek/pokegrader.js"
-    #   app_domain   = "pokegrader.stevezelek.com"
-    #   is_subdomain = true
-    # }
+    {
+      app_name     = "stevezelek-com"
+      github_repo  = "smzelek/stevezelek.com"
+      app_domain   = "stevezelek.com"
+      subdomain_of = ""
+    }
   ]
 }
 
@@ -67,11 +76,12 @@ module "app" {
   }
 
   # per-app properties
-  app_name    = each.value.app_name
-  github_repo = each.value.github_repo
-  app_domain  = each.value.app_domain
-  bootstrap   = each.value.bootstrap
-  api_domain  = each.value.api_domain
+  app_name     = each.value.app_name
+  github_repo  = each.value.github_repo
+  app_domain   = each.value.app_domain
+  bootstrap    = each.value.bootstrap
+  api_domain   = each.value.api_domain
+  subdomain_of = each.value.subdomain_of
 
   # universal cluster values
   cluster_arn            = module.cluster.cluster_arn
@@ -97,7 +107,7 @@ module "static_app" {
   app_name     = each.value.app_name
   github_repo  = each.value.github_repo
   app_domain   = each.value.app_domain
-  is_subdomain = each.value.is_subdomain
+  subdomain_of = each.value.subdomain_of
 }
 
 data "aws_instances" "asg_instances" {

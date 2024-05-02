@@ -37,15 +37,23 @@ resource "aws_s3_bucket_website_configuration" "default" {
     suffix = "index.html"
   }
 }
+
+resource "aws_s3_bucket_cors_configuration" "default" {
+  bucket = aws_s3_bucket.default.bucket
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET"]
+    allowed_origins = ["*"]
+  }
+}
+
 data "aws_cloudfront_cache_policy" "disabled" {
   name = "Managed-CachingDisabled"
 }
 
 resource "aws_cloudfront_distribution" "default" {
-  aliases = [
-    var.app_domain,
-    "*.${var.app_domain}"
-  ]
+  aliases             = local.is_subdomain ? ["${var.app_domain}.${var.subdomain_of}"] : [var.app_domain, "www.${var.app_domain}"]
   enabled             = true
   http_version        = "http2"
   is_ipv6_enabled     = true
@@ -93,24 +101,27 @@ resource "aws_cloudfront_distribution" "default" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.default.arn
+    acm_certificate_arn      = aws_acm_certificate_validation.default.certificate_arn
     minimum_protocol_version = "TLSv1"
     ssl_support_method       = "sni-only"
   }
 }
 
+data "aws_acm_certificate" "subdomain_of" {
+  count  = local.is_subdomain ? 1 : 0
+  domain = var.subdomain_of
+}
+
 resource "aws_acm_certificate" "default" {
-  domain_name       = var.app_domain
-  key_algorithm     = "RSA_2048"
-  validation_method = "DNS"
-  subject_alternative_names = [
-    var.app_domain,
-    "*.${var.app_domain}",
-  ]
+  count                     = local.is_subdomain ? 0 : 1
+  domain_name               = var.app_domain
+  key_algorithm             = "RSA_2048"
+  validation_method         = "DNS"
+  subject_alternative_names = ["*.${var.app_domain}"]
 }
 
 # Must go handle DNS validation manually
-# resource "aws_acm_certificate_validation" "default" {
-#   certificate_arn = aws_acm_certificate.default.arn
-# }
+resource "aws_acm_certificate_validation" "default" {
+  certificate_arn = local.is_subdomain ? data.aws_acm_certificate.subdomain_of[0].arn : aws_acm_certificate.default[0].arn
+}
 
