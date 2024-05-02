@@ -18,7 +18,7 @@ variable "vpc_id" {
   type = string
 }
 
-variable "load_balancer_arn" {
+variable "load_balancer_listener_arn" {
   type = string
 }
 
@@ -46,7 +46,11 @@ variable "app_domain" {
   type = string
 }
 
-variable "app_frontend_domain" {
+variable "api_domain" {
+  type = string
+}
+
+variable "email_alert_topic_arn" {
   type = string
 }
 

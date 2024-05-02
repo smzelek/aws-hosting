@@ -37,6 +37,7 @@ resource "aws_s3_bucket_website_configuration" "default" {
     suffix = "index.html"
   }
 }
+
 data "aws_cloudfront_cache_policy" "disabled" {
   name = "Managed-CachingDisabled"
 }
@@ -93,24 +94,20 @@ resource "aws_cloudfront_distribution" "default" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.default.arn
+    acm_certificate_arn      = aws_acm_certificate_validation.default.certificate_arn
     minimum_protocol_version = "TLSv1"
     ssl_support_method       = "sni-only"
   }
 }
 
 resource "aws_acm_certificate" "default" {
-  domain_name       = var.app_domain
+  domain_name       = var.is_subdomain ? var.app_domain : "*.${var.app_domain}"
   key_algorithm     = "RSA_2048"
   validation_method = "DNS"
-  subject_alternative_names = [
-    var.app_domain,
-    "*.${var.app_domain}",
-  ]
 }
 
 # Must go handle DNS validation manually
-# resource "aws_acm_certificate_validation" "default" {
-#   certificate_arn = aws_acm_certificate.default.arn
-# }
+resource "aws_acm_certificate_validation" "default" {
+  certificate_arn = aws_acm_certificate.default.arn
+}
 

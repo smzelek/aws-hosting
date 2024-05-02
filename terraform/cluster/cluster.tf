@@ -101,3 +101,44 @@ resource "aws_iam_role_policy_attachment" "instance_role_ssm_policy_attachment" 
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   role = aws_iam_role.instance_role.name
 }
+
+resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
+  alarm_name          = "cluster-cpu-alarm"
+  namespace           = "AWS/ECS"
+  metric_name         = "CPUUtilization"
+  statistic           = "Average"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 90
+  period              = 60
+  evaluation_periods  = 5
+  treat_missing_data  = "breaching"
+  datapoints_to_alarm = 5
+
+  alarm_actions = [var.email_alert_topic_arn]
+  ok_actions    = [var.email_alert_topic_arn]
+
+  dimensions = {
+    ClusterName = aws_ecs_cluster.cluster.name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "memory_alarm" {
+  alarm_name          = "cluster-memory-alarm"
+  namespace           = "AWS/ECS"
+  metric_name         = "MemoryUtilization"
+  statistic           = "Average"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 90
+  period              = 60
+  evaluation_periods  = 5
+  treat_missing_data  = "breaching"
+  datapoints_to_alarm = 5
+
+  alarm_actions = [var.email_alert_topic_arn]
+  ok_actions    = [var.email_alert_topic_arn]
+
+  dimensions = {
+    ClusterName = aws_ecs_cluster.cluster.name
+  }
+}
+

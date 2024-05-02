@@ -21,7 +21,7 @@ resource "aws_iam_role_policy_attachment" "task_execution_role_policy_attachment
 }
 
 resource "aws_iam_role_policy" "task_execution_role_secret_policy" {
-  role = aws_iam_role.task_execution_role.name
+  role  = aws_iam_role.task_execution_role.name
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -51,7 +51,7 @@ resource "aws_iam_role_policy_attachment" "task_role_policy_attachment" {
 
 # unused
 resource "aws_iam_policy" "task_role_policy" {
-  name = "${var.app_name}-task-role-policy"
+  name  = "${var.app_name}-task-role-policy"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

@@ -1,12 +1,16 @@
 data "aws_caller_identity" "current" {}
 
+data "aws_iam_openid_connect_provider" "github" {
+  url = "https://token.actions.githubusercontent.com"
+}
+
 data "aws_iam_policy_document" "github_oidc_repo_role" {
   statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]
 
     principals {
       type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.github.arn]
+      identifiers = [data.aws_iam_openid_connect_provider.github.arn]
     }
     condition {
       test     = "StringEquals"
@@ -19,12 +23,6 @@ data "aws_iam_policy_document" "github_oidc_repo_role" {
       values   = ["sts.amazonaws.com"]
     }
   }
-}
-
-resource "aws_iam_openid_connect_provider" "github" {
-  url             = "https://token.actions.githubusercontent.com"
-  client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = ["1b511abead59c6ce207077c0bf0e0043b1382612"]
 }
 
 resource "aws_iam_role" "github_role" {

@@ -25,6 +25,7 @@ resource "aws_secretsmanager_secret" "secrets" {
   name                    = "${var.app_name}-secrets"
   recovery_window_in_days = 0
 }
+
 # Service
 resource "aws_ecr_repository" "image_repository" {
   name                 = var.app_name
@@ -36,20 +37,9 @@ resource "aws_cloudwatch_log_group" "default" {
   name              = var.app_name
   retention_in_days = 365
 }
-resource "aws_alb_listener" "alb_listener_http" {
-  load_balancer_arn = var.load_balancer_arn
-
-  port     = 80
-  protocol = "HTTP"
-
-  default_action {
-    target_group_arn = aws_lb_target_group.target_group.arn
-    type             = "forward"
-  }
-}
 
 resource "aws_lb_listener_rule" "alb_listener_rule_http" {
-  listener_arn = aws_alb_listener.alb_listener_http.arn
+  listener_arn = var.load_balancer_listener_arn
 
   action {
     target_group_arn = aws_lb_target_group.target_group.arn
@@ -58,7 +48,7 @@ resource "aws_lb_listener_rule" "alb_listener_rule_http" {
 
   condition {
     host_header {
-      values = [var.app_domain]
+      values = [var.api_domain]
     }
   }
 }

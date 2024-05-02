@@ -59,7 +59,7 @@ resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.default.id
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.nat_gateway.id
   }
 }
@@ -107,4 +107,22 @@ resource "aws_alb" "default" {
   internal        = false
   security_groups = [aws_security_group.open_internet.id]
   subnets         = [aws_subnet.public_1.id, aws_subnet.public_2.id]
+}
+
+resource "aws_alb_listener" "alb_listener_http" {
+  load_balancer_arn = aws_alb.default.arn
+
+  port     = 80
+  protocol = "HTTP"
+
+  default_action {
+    type             = "fixed-response"
+    target_group_arn = null
+
+    fixed_response {
+      status_code  = 404
+      content_type = "application/json"
+      message_body = "{\"meta\":{\"status\":404,\"version\":\"dev\"},\"error\":\"Not Found\"}"
+    }
+  }
 }
