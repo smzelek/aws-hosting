@@ -49,7 +49,7 @@ resource "aws_lb_listener_rule" "alb_listener_rule_http" {
   condition {
     host_header {
       values = [
-        local.is_subdomain ? "${var.api_domain}${var.subdomain_of}" : var.api_domain
+        local.is_subdomain ? "${var.api_domain}.${var.subdomain_of}" : var.api_domain
       ]
     }
   }

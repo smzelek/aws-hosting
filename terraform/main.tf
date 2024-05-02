@@ -33,7 +33,7 @@ locals {
       app_domain   = "tic-metac-toe"
       api_domain   = "tic-metac-toe-api"
       subdomain_of = "stevezelek.com"
-      bootstrap    = true
+      bootstrap    = false
     },
   ]
 
@@ -116,29 +116,29 @@ data "aws_instances" "asg_instances" {
   }
 }
 
-output "app_links" {
-  value = merge(
-    {
-      for app in local.apps : app.app_name => {
-        certificate_link  = module.app[app.app_name].certificate_link
-        secrets_link      = module.app[app.app_name].secrets_link
-        cloudfront_domain = module.app[app.app_name].cloudfront_domain
-      }
-    },
-    {
-      for app in local.static_apps : app.app_name => {
-        certificate_link  = module.static_app[app.app_name].certificate_link
-        cloudfront_domain = module.static_app[app.app_name].cloudfront_domain
-      }
-    },
-  )
-}
-
-output "load_balancer_domain" {
+output "_1_load_balancer_domain" {
   value = module.cluster.load_balancer_domain
 }
 
-output "instance_ids" {
+output "_2_instance_ids" {
   value = data.aws_instances.asg_instances.ids
 }
 
+output "_3_static_app_links" {
+  value = {
+    for app in local.static_apps : app.app_name => {
+      certificate_link  = module.static_app[app.app_name].certificate_link
+      cloudfront_domain = module.static_app[app.app_name].cloudfront_domain
+    }
+  }
+}
+
+output "_4_app_links" {
+  value = {
+    for app in local.apps : app.app_name => {
+      certificate_link  = module.app[app.app_name].certificate_link
+      secrets_link      = module.app[app.app_name].secrets_link
+      cloudfront_domain = module.app[app.app_name].cloudfront_domain
+    }
+  }
+}
