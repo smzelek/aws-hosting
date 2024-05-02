@@ -27,7 +27,7 @@ data "aws_iam_policy_document" "github_oidc_repo_role" {
 
 
 resource "aws_iam_role" "github_role" {
-  name               = "${var.app_name}-github-role"
+  name               = "${local.fq_app_name}-github-role"
   assume_role_policy = data.aws_iam_policy_document.github_oidc_repo_role.json
 }
 

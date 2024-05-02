@@ -11,11 +11,11 @@ resource "aws_cloudwatch_dashboard" "default" {
     }
   )
 
-  dashboard_name = "${var.app_name}-dashboard"
+  dashboard_name = "${local.fq_app_name}-dashboard"
 }
 
 resource "aws_cloudwatch_metric_alarm" "crash_alarm" {
-  alarm_name          = "${var.app_name}-crash-alarm"
+  alarm_name          = "${local.fq_app_name}-crash-alarm"
   namespace           = "AWS/ApplicationELB"
   metric_name         = "UnHealthyHostCount"
   statistic           = "Sum"
@@ -36,7 +36,7 @@ resource "aws_cloudwatch_metric_alarm" "crash_alarm" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
-  alarm_name          = "${var.app_name}-cpu-alarm"
+  alarm_name          = "${local.fq_app_name}-cpu-alarm"
   namespace           = "AWS/ECS"
   metric_name         = "CPUUtilization"
   statistic           = "Average"
@@ -57,7 +57,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "memory_alarm" {
-  alarm_name          = "${var.app_name}-memory-alarm"
+  alarm_name          = "${local.fq_app_name}-memory-alarm"
   namespace           = "AWS/ECS"
   metric_name         = "MemoryUtilization"
   statistic           = "Average"

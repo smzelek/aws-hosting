@@ -43,7 +43,13 @@ locals {
       github_repo  = "smzelek/stevezelek.com"
       app_domain   = "stevezelek.com"
       subdomain_of = ""
-    }
+    },
+    {
+      app_name     = "pokegrader"
+      github_repo  = "smzelek/pokegrader"
+      app_domain   = "pokegrader"
+      subdomain_of = "stevezelek.com"
+    },
   ]
 }
 

@@ -11,30 +11,30 @@ data "aws_region" "current" {}
 data "aws_ecs_service" "current_service" {
   count        = var.bootstrap ? 0 : 1
   cluster_arn  = var.cluster_arn
-  service_name = var.app_name
+  service_name = local.fq_app_name
 }
 
 data "aws_ecs_container_definition" "current_container_definition" {
   count           = var.bootstrap ? 0 : 1
   task_definition = data.aws_ecs_service.current_service[0].task_definition
-  container_name  = var.app_name
+  container_name  = local.fq_app_name
 }
 
 # Manually manage the secret as an env file in AWS Secrets Manager UI
 resource "aws_secretsmanager_secret" "secrets" {
-  name                    = "${var.app_name}-secrets"
+  name                    = "${local.fq_app_name}-secrets"
   recovery_window_in_days = 0
 }
 
 # Service
 resource "aws_ecr_repository" "image_repository" {
-  name                 = var.app_name
+  name                 = local.fq_app_name
   image_tag_mutability = "MUTABLE"
   force_delete         = true
 }
 
 resource "aws_cloudwatch_log_group" "default" {
-  name              = var.app_name
+  name              = local.fq_app_name
   retention_in_days = 365
 }
 
@@ -56,7 +56,7 @@ resource "aws_lb_listener_rule" "alb_listener_rule_http" {
 }
 
 resource "aws_lb_target_group" "target_group" {
-  name                 = var.app_name
+  name                 = local.fq_app_name
   port                 = 80
   protocol             = "HTTP"
   target_type          = "ip"
@@ -74,7 +74,7 @@ resource "aws_lb_target_group" "target_group" {
 }
 
 resource "aws_ecs_service" "service" {
-  name            = var.app_name
+  name            = local.fq_app_name
   cluster         = var.cluster_arn
   task_definition = aws_ecs_task_definition.task_definition.arn
   desired_count   = 1
@@ -92,7 +92,7 @@ resource "aws_ecs_service" "service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.target_group.arn
-    container_name   = var.app_name
+    container_name   = local.fq_app_name
     container_port   = 80
   }
 
@@ -103,7 +103,7 @@ resource "aws_ecs_service" "service" {
 }
 
 resource "aws_ecs_task_definition" "task_definition" {
-  family             = var.app_name
+  family             = local.fq_app_name
   network_mode       = "awsvpc"
   execution_role_arn = aws_iam_role.task_execution_role.arn
   task_role_arn      = aws_iam_role.task_role.arn
@@ -112,7 +112,7 @@ resource "aws_ecs_task_definition" "task_definition" {
 
   container_definitions = jsonencode([
     {
-      name      = var.app_name
+      name      = local.fq_app_name
       image     = local.image
       memory    = 200
       essential = true
@@ -130,7 +130,7 @@ resource "aws_ecs_task_definition" "task_definition" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = var.app_name
+          awslogs-group         = local.fq_app_name
           awslogs-region        = data.aws_region.current.name
           awslogs-stream-prefix = "ecs"
         }

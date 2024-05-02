@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "default" {
-  bucket        = var.app_name
+  bucket        = local.fq_app_name
   force_destroy = true
 }
 

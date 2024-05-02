@@ -11,7 +11,7 @@ data "aws_iam_policy_document" "ecs_task_assume_role_policy_document" {
 
 # IAM Task Execution Role
 resource "aws_iam_role" "task_execution_role" {
-  name               = "${var.app_name}-task-execution-role"
+  name               = "${local.fq_app_name}-task-execution-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume_role_policy_document.json
 }
 
@@ -40,7 +40,7 @@ resource "aws_iam_role_policy" "task_execution_role_secret_policy" {
 
 # IAM Task Role
 resource "aws_iam_role" "task_role" {
-  name               = "${var.app_name}-task-role"
+  name               = "${local.fq_app_name}-task-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume_role_policy_document.json
 }
 
@@ -51,7 +51,7 @@ resource "aws_iam_role_policy_attachment" "task_role_policy_attachment" {
 
 # unused
 resource "aws_iam_policy" "task_role_policy" {
-  name  = "${var.app_name}-task-role-policy"
+  name  = "${local.fq_app_name}-task-role-policy"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
