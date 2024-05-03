@@ -34,6 +34,6 @@ output "subnet_ids" {
   value = [aws_subnet.private_1.id]
 }
 
-output "security_group_ids" {
-  value = [aws_security_group.open_internet.id]
+output "ecs_security_group_ids" {
+  value = [aws_security_group.ecs_sg.id]
 }

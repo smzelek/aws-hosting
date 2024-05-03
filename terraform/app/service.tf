@@ -59,7 +59,7 @@ resource "aws_lb_target_group" "target_group" {
   name                 = local.fq_app_name
   port                 = 80
   protocol             = "HTTP"
-  target_type          = "ip"
+  target_type          = "instance"
   vpc_id               = var.vpc_id
   deregistration_delay = "5"
 
@@ -85,10 +85,10 @@ resource "aws_ecs_service" "service" {
     capacity_provider = var.capacity_provider_name
   }
 
-  network_configuration {
-    subnets         = var.subnet_ids
-    security_groups = var.security_group_ids
-  }
+  # network_configuration {
+  #   subnets         = var.subnet_ids
+  #   security_groups = var.ecs_security_group_ids
+  # }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.target_group.arn
@@ -104,7 +104,7 @@ resource "aws_ecs_service" "service" {
 
 resource "aws_ecs_task_definition" "task_definition" {
   family             = local.fq_app_name
-  network_mode       = "awsvpc"
+  network_mode       = "bridge"
   execution_role_arn = aws_iam_role.task_execution_role.arn
   task_role_arn      = aws_iam_role.task_role.arn
 

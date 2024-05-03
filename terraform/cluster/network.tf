@@ -73,9 +73,9 @@ resource "aws_nat_gateway" "nat_gateway" {
   subnet_id     = aws_subnet.public_1.id
 }
 
-resource "aws_security_group" "open_internet" {
+resource "aws_security_group" "lb_sg" {
   vpc_id = aws_vpc.default.id
-  name   = "open_internet"
+  name   = "lb_sg"
 
   ingress {
     description = "Insecure inbound traffic."
@@ -102,10 +102,33 @@ resource "aws_security_group" "open_internet" {
   }
 }
 
+resource "aws_security_group" "ecs_sg" {
+  vpc_id = aws_vpc.default.id
+  name   = "ecs_sg"
+}
+
+resource "aws_security_group_rule" "all_lb_to_ecs" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.lb_sg.id
+  security_group_id        = aws_security_group.ecs_sg.id
+}
+
+resource "aws_security_group_rule" "all_ecs_egress" {
+  type        = "egress"
+  from_port   = 0
+  to_port     = 0
+  protocol    = "-1"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.ecs_sg.id
+}
+
 resource "aws_alb" "default" {
   name            = "cluster-lb"
   internal        = false
-  security_groups = [aws_security_group.open_internet.id]
+  security_groups = [aws_security_group.lb_sg.id]
   subnets         = [aws_subnet.public_1.id, aws_subnet.public_2.id]
 }
 

@@ -35,6 +35,14 @@ locals {
       subdomain_of = "stevezelek.com"
       bootstrap    = false
     },
+    {
+      app_name     = "raidtimers-com"
+      github_repo  = "smzelek/raidtimers.com"
+      app_domain   = "raidtimers.com"
+      api_domain   = "api.raidtimers.com"
+      subdomain_of = ""
+      bootstrap    = false
+    },
   ]
 
   static_apps = [
@@ -48,6 +56,12 @@ locals {
       app_name     = "pokegrader"
       github_repo  = "smzelek/pokegrader"
       app_domain   = "pokegrader"
+      subdomain_of = "stevezelek.com"
+    },
+    {
+      app_name     = "take-me-apart"
+      github_repo  = "smzelek/take-me-apart"
+      app_domain   = "take-me-apart"
       subdomain_of = "stevezelek.com"
     },
   ]
@@ -99,7 +113,7 @@ module "app" {
   load_balancer_arn_suffix   = module.cluster.load_balancer_arn_suffix
   capacity_provider_name     = module.cluster.capacity_provider_name
   subnet_ids                 = module.cluster.subnet_ids
-  security_group_ids         = module.cluster.security_group_ids
+  ecs_security_group_ids     = module.cluster.ecs_security_group_ids
   email_alert_topic_arn      = aws_sns_topic.email_alerts.arn
 }
 

@@ -30,6 +30,7 @@ resource "aws_autoscaling_group" "autoscaling_group" {
   name                = "autoscaling_group"
   min_size            = 0
   max_size            = 1
+  desired_capacity    = 1
   vpc_zone_identifier = [aws_subnet.private_1.id]
   enabled_metrics = [
     "GroupMinSize",
@@ -64,7 +65,7 @@ resource "aws_launch_template" "cluster_instance_template" {
   image_id               = "ami-0046cbbe25829d3a8"
   instance_type          = "t4g.small"
   update_default_version = true
-  vpc_security_group_ids = [aws_security_group.open_internet.id]
+  vpc_security_group_ids = [aws_security_group.ecs_sg.id]
   user_data              = base64encode("#!/bin/bash\necho ECS_CLUSTER=${aws_ecs_cluster.cluster.name} >> /etc/ecs/ecs.config")
 
   iam_instance_profile {
