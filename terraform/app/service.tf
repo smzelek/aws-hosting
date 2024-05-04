@@ -26,7 +26,6 @@ resource "aws_secretsmanager_secret" "secrets" {
   recovery_window_in_days = 0
 }
 
-# Service
 resource "aws_ecr_repository" "image_repository" {
   name                 = local.fq_app_name
   image_tag_mutability = "MUTABLE"
@@ -84,11 +83,6 @@ resource "aws_ecs_service" "service" {
     weight            = 100
     capacity_provider = var.capacity_provider_name
   }
-
-  # network_configuration {
-  #   subnets         = var.subnet_ids
-  #   security_groups = var.ecs_security_group_ids
-  # }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.target_group.arn

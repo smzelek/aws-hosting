@@ -1,32 +1,27 @@
 # aws-hosting
 
-service = 
-    the code
-    the secrets
-    the infra settings (task def)
+This repo represents my new theory of service management (as opposed to Appflow work):
+* Code/secrets/infra will not be atomically committed together.
+* Code will be in its own service repo.
+* Secrets will be versioned purely by secrets manager, not bound to a deploy version.
+* Service repo will have no knowledge of task definition/terraform.
 
-    --- these 3 things should change atomically (in 1 commit + pipeline actions)
+Reasoning:
+* While it may make sense in theory to atomically update secrets, code, and infra all via a single git commit and subsequent deploy, this has problems:
+    * You may want to rollback code without rolling back secrets. (i.e: A problematic code change was made, at the same time as an API key was correctly rotated and the old API key linked to the rollback commit is actually invalid now).
+    * Theoretically, the code does not need to have any knowledge of the infra that is running it in most cases. Simple services don't need to control anything more than their own Docker container - this lets them draw an abstraction boundary.
+    * The Code-as-Dockerfile output could be consumed in various places, it doesn't need to know how it gets run.
+    * Terraform and task-definition JSON files are out of place in a service repo from a language and domain standpoint. Someone working on that service repo may have no familiarity with that kind of DevOps tool or AWS concept.
+    * Using task definitions inside the service repo means hard coding resources (IAMs, etc) that are only known to the Terraform repo. It's easier to keep these things in sync if they are referenced using terraform resource identifiers.
+* Admittedly there are some pitfalls to watch out for in this new model:
+    * Changes involving secrets must be made in a backwards/forwards compatible way. Rollback deploys must not rollback to a version dependent on a deleted secret.
+    * Infra resource provisioning changes should be made mindfully based on changes to the needs of the service, but this is not too unexpected -- infra changes are usually made in retrospect based on observed changes rather than adding pre-planned capacity.
 
-* dockerize the code
-* secrets => AWS SM as a single k=v file; upload with commit as version stage
-* task definition: has mem, cpu, etc... 
-    also needs to have TF identifiers hardcoded (👎🏼)
-
-    conflict: want to have in TF repo to avoid hardcoded identifiers
-    but want to have in Service repo to properly use commit hash in version stage for secrets manager...
-
-    although, do you actually want to use commit-versioned secrets?
-
-    arguably you might want to rollback the code without rolling back (for example) a revoked+rotated Sentry Token
-    it's likely better for secrets to exist independent of the code, and to manually fix secrets if there's an issue, 
-    or separately rollback the secretsmanager version of those secrets
-* 
+At the very least, this makes a lot more sense as a go-to for boilerplate webapp services --- if a service has way more need for dealing with AWS hands on, it could bring in Terraform at that point when it makes sense for the repo's domain.
 
 ## Start local CLI ssh session on instance
 ```bash
-aws --profile kerukion-admin ssm start-session --target i-0ce55fd178fc85fe9
-
-TOKEN=`curl --no-progress-meter -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` && curl --no-progress-meter -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/iam/info && echo
+bash ./scripts/ssh.sh <instance_id>
 ```
 
 ## Build and push docker default-image

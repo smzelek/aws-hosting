@@ -104,11 +104,10 @@ module "app" {
   subdomain_of = each.value.subdomain_of
 
   # universal cluster values
-  cluster_arn            = module.cluster.cluster_arn
-  cluster_name           = module.cluster.cluster_name
-  autoscaling_group_name = module.cluster.autoscaling_group_name
-  vpc_id                 = module.cluster.vpc_id
-
+  cluster_arn                = module.cluster.cluster_arn
+  cluster_name               = module.cluster.cluster_name
+  autoscaling_group_name     = module.cluster.autoscaling_group_name
+  vpc_id                     = module.cluster.vpc_id
   load_balancer_listener_arn = module.cluster.load_balancer_listener_arn
   load_balancer_arn_suffix   = module.cluster.load_balancer_arn_suffix
   capacity_provider_name     = module.cluster.capacity_provider_name
