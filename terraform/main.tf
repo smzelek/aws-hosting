@@ -28,11 +28,11 @@ locals {
       bootstrap    = false
     },
     {
-      app_name     = "tic-metac-toe"
-      github_repo  = "smzelek/tic-metac-toe"
-      app_domain   = "tic-metac-toe"
-      api_domain   = "tic-metac-toe-api"
-      subdomain_of = "stevezelek.com"
+      app_name     = "ticmetactoe-com"
+      github_repo  = "smzelek/ticmetactoe.com"
+      app_domain   = "ticmetactoe.com"
+      api_domain   = "api.ticmetactoe.com"
+      subdomain_of = ""
       bootstrap    = false
     },
     {
@@ -53,16 +53,16 @@ locals {
       subdomain_of = ""
     },
     {
-      app_name     = "pokegrader"
-      github_repo  = "smzelek/pokegrader"
-      app_domain   = "pokegrader"
-      subdomain_of = "stevezelek.com"
+      app_name     = "pokegrader-com"
+      github_repo  = "smzelek/pokegrader.com"
+      app_domain   = "pokegrader.com"
+      subdomain_of = ""
     },
     {
-      app_name     = "take-me-apart"
-      github_repo  = "smzelek/take-me-apart"
-      app_domain   = "take-me-apart"
-      subdomain_of = "stevezelek.com"
+      app_name     = "takemeapart-com"
+      github_repo  = "smzelek/takemeapart.com"
+      app_domain   = "takemeapart.com"
+      subdomain_of = ""
     },
   ]
 }

@@ -61,6 +61,10 @@ resource "aws_lb_target_group" "target_group" {
   target_type          = "instance"
   vpc_id               = var.vpc_id
   deregistration_delay = "5"
+  
+  lifecycle {
+    create_before_destroy = true
+  }
 
   health_check {
     matcher             = "200-399"
