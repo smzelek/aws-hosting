@@ -1,0 +1,55 @@
+name: Deploy app
+# Requires secrets:
+# CLOUDFLARE_TOKEN
+# GITHUB_TOKEN
+
+env:
+  AWS_ACCOUNT_ID: 590184101838
+  AWS_REGION: us-east-1
+
+on:
+  workflow_call:
+    # Requires secrets: inherit
+    inputs:
+      aws-app:
+        required: true
+        type: string
+      cloudflare-zone:
+        required: true
+        type: string
+      app-artifact:
+        required: true
+        type: string
+
+jobs:
+  deploy-app:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ inputs.aws-app }}-github-role
+        aws-region: ${{ env.AWS_REGION }}
+        mask-aws-account-id: 'no'
+    - name: Download app artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ inputs.app-artifact }}
+        path: ${{ github.workspace }}/${{ inputs.app-artifact }}
+    - name: Deploy app
+      run: |
+        cd ${{ inputs.app-artifact }}
+        aws s3 cp . s3://${{ inputs.aws-app }} --recursive
+    - name: Purge Cloudflare Cache
+      run: |
+        curl -fsSL "https://api.cloudflare.com/client/v4/zones/${{ inputs.cloudflare-zone }}/purge_cache" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything": true}' \
+            --fail --show-error
+      shell: bash
