@@ -61,7 +61,7 @@ resource "aws_lb_target_group" "target_group" {
   target_type          = "instance"
   vpc_id               = var.vpc_id
   deregistration_delay = "5"
-  
+
   lifecycle {
     create_before_destroy = true
   }
@@ -107,6 +107,13 @@ resource "aws_ecs_task_definition" "task_definition" {
   task_role_arn      = aws_iam_role.task_role.arn
 
   track_latest = true
+
+  lifecycle {
+    ignore_changes = [
+      tags,
+      tags_all
+    ]
+  }
 
   container_definitions = jsonencode([
     {

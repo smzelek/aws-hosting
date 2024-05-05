@@ -31,7 +31,7 @@ resource "aws_autoscaling_group" "autoscaling_group" {
   min_size            = 0
   max_size            = 1
   desired_capacity    = 1
-  vpc_zone_identifier = [aws_subnet.private_1.id]
+  vpc_zone_identifier = [aws_subnet.private_1.id, aws_subnet.private_2.id]
   enabled_metrics = [
     "GroupMinSize",
     "GroupMaxSize",

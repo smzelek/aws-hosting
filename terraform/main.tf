@@ -8,6 +8,12 @@ terraform {
 
 provider "aws" {
   region = "us-east-1"
+
+  default_tags {
+    tags = {
+      ManagedBy = "smzelek/aws-hosting/terraform"
+    }
+  }
 }
 
 locals {
@@ -111,7 +117,7 @@ module "app" {
   load_balancer_listener_arn = module.cluster.load_balancer_listener_arn
   load_balancer_arn_suffix   = module.cluster.load_balancer_arn_suffix
   capacity_provider_name     = module.cluster.capacity_provider_name
-  subnet_ids                 = module.cluster.subnet_ids
+  subnet_ids                 = module.cluster.private_subnet_ids
   ecs_security_group_ids     = module.cluster.ecs_security_group_ids
   email_alert_topic_arn      = aws_sns_topic.email_alerts.arn
 }
@@ -135,15 +141,17 @@ data "aws_instances" "asg_instances" {
   }
 }
 
-output "_1_load_balancer_domain" {
-  value = module.cluster.load_balancer_domain
+output "_1_app_links" {
+  value = {
+    for app in local.apps : app.app_name => {
+      certificate_link  = module.app[app.app_name].certificate_link
+      secrets_link      = module.app[app.app_name].secrets_link
+      cloudfront_domain = module.app[app.app_name].cloudfront_domain
+    }
+  }
 }
 
-output "_2_instance_ids" {
-  value = data.aws_instances.asg_instances.ids
-}
-
-output "_3_static_app_links" {
+output "_2_static_app_links" {
   value = {
     for app in local.static_apps : app.app_name => {
       certificate_link  = module.static_app[app.app_name].certificate_link
@@ -152,12 +160,18 @@ output "_3_static_app_links" {
   }
 }
 
-output "_4_app_links" {
-  value = {
-    for app in local.apps : app.app_name => {
-      certificate_link  = module.app[app.app_name].certificate_link
-      secrets_link      = module.app[app.app_name].secrets_link
-      cloudfront_domain = module.app[app.app_name].cloudfront_domain
-    }
-  }
+output "_3_load_balancer_domain" {
+  value = module.cluster.load_balancer_domain
+}
+
+output "_4_instance_ids" {
+  value = data.aws_instances.asg_instances.ids
+}
+
+output "_5_rds_endpoint" {
+  value = module.cluster.rds_endpoint
+}
+
+output "_6_rds_password" {
+  value = nonsensitive(module.cluster.rds_password)
 }

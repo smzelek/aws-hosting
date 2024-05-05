@@ -32,3 +32,9 @@ aws --profile kerukion-admin ecr get-login-password --region us-east-1 | docker 
 sudo docker build default_image/ -t "${ECR_TAG}" && \
 sudo docker push "${ECR_TAG}"
 ```
+
+## Connect to RDS DB
+```bash
+bash ./scripts/tunnel.sh <instance-id>
+# open PGAdmin and connect to 127.0.0.1:9999
+```

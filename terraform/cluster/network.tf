@@ -50,8 +50,23 @@ resource "aws_subnet" "public_2" {
   }
 }
 
-resource "aws_route_table_association" "private_route_table_association" {
+resource "aws_subnet" "private_2" {
+  vpc_id                  = aws_vpc.default.id
+  availability_zone       = "us-east-1c"
+  cidr_block              = cidrsubnet(local.base_cidr, 8, 3)
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "private-2"
+  }
+}
+
+resource "aws_route_table_association" "private_1_route_table_association" {
   subnet_id      = aws_subnet.private_1.id
+  route_table_id = aws_route_table.private_route_table.id
+}
+
+resource "aws_route_table_association" "private_2_route_table_association" {
+  subnet_id      = aws_subnet.private_2.id
   route_table_id = aws_route_table.private_route_table.id
 }
 
@@ -102,6 +117,29 @@ resource "aws_security_group" "lb_sg" {
   }
 }
 
+resource "aws_security_group" "db_sg" {
+  vpc_id = aws_vpc.default.id
+  name   = "db_sg"
+}
+
+resource "aws_security_group_rule" "all_ecs_to_db" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.ecs_sg.id
+  security_group_id        = aws_security_group.db_sg.id
+}
+
+resource "aws_security_group_rule" "all_db_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.db_sg.id
+}
+
 resource "aws_security_group" "ecs_sg" {
   vpc_id = aws_vpc.default.id
   name   = "ecs_sg"
@@ -117,11 +155,11 @@ resource "aws_security_group_rule" "all_lb_to_ecs" {
 }
 
 resource "aws_security_group_rule" "all_ecs_egress" {
-  type        = "egress"
-  from_port   = 0
-  to_port     = 0
-  protocol    = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.ecs_sg.id
 }
 

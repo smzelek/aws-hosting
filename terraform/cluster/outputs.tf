@@ -30,10 +30,19 @@ output "vpc_id" {
   value = aws_vpc.default.id
 }
 
-output "subnet_ids" {
-  value = [aws_subnet.private_1.id]
+output "private_subnet_ids" {
+  value = [aws_subnet.private_1.id, aws_subnet.private_2.id]
 }
 
 output "ecs_security_group_ids" {
   value = [aws_security_group.ecs_sg.id]
+}
+
+output "rds_endpoint" {
+  value = aws_db_instance.default.endpoint
+}
+
+output "rds_password" {
+  sensitive = true
+  value     = aws_secretsmanager_secret_version.db_password.secret_string
 }
