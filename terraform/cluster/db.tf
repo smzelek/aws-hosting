@@ -22,31 +22,26 @@ resource "aws_secretsmanager_secret_version" "db_password" {
 }
 
 resource "aws_db_instance" "default" {
-  allocated_storage     = 20
-  max_allocated_storage = 1000
-  apply_immediately     = true
-
-  storage_type   = "gp2"
-  engine         = "postgres"
-  engine_version = "16.2"
-  instance_class = "db.t3.micro"
-  identifier     = "cluster-db"
-  username       = "postgres"
-  password       = random_password.master_password.result
-
-  vpc_security_group_ids = [aws_security_group.db_sg.id]
-  db_subnet_group_name   = aws_db_subnet_group.default.name
-  publicly_accessible    = false
-
+  allocated_storage            = 20
+  max_allocated_storage        = 1000
+  apply_immediately            = true
+  storage_type                 = "gp2"
+  engine                       = "postgres"
+  engine_version               = "16.2"
+  instance_class               = "db.t3.micro"
+  identifier                   = "cluster-db"
+  username                     = "postgres"
+  password                     = random_password.master_password.result
+  vpc_security_group_ids       = [aws_security_group.db_sg.id]
+  db_subnet_group_name         = aws_db_subnet_group.default.name
+  publicly_accessible          = false
   backup_retention_period      = 7
   backup_window                = "03:00-04:00"
   maintenance_window           = "mon:04:00-mon:04:30"
   skip_final_snapshot          = true
   performance_insights_enabled = true
   storage_encrypted            = true
-
-  parameter_group_name  = "default.postgres16"
-  copy_tags_to_snapshot = true
-
-  multi_az = false
+  parameter_group_name         = "default.postgres16"
+  copy_tags_to_snapshot        = true
+  multi_az                     = false
 }

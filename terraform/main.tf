@@ -31,7 +31,7 @@ locals {
       app_domain   = "guildvaults.com"
       api_domain   = "api.guildvaults.com"
       subdomain_of = ""
-      bootstrap    = false
+      bootstrap    = true
     },
     {
       app_name     = "ticmetactoe-com"
@@ -39,7 +39,7 @@ locals {
       app_domain   = "ticmetactoe.com"
       api_domain   = "api.ticmetactoe.com"
       subdomain_of = ""
-      bootstrap    = false
+      bootstrap    = true
     },
     {
       app_name     = "raidtimers-com"
@@ -47,7 +47,7 @@ locals {
       app_domain   = "raidtimers.com"
       api_domain   = "api.raidtimers.com"
       subdomain_of = ""
-      bootstrap    = false
+      bootstrap    = true
     },
   ]
 
@@ -74,7 +74,8 @@ locals {
 }
 
 resource "aws_ecr_repository" "default_image" {
-  name = "default-image"
+  force_delete = true
+  name         = "default-image"
 }
 
 resource "aws_sns_topic" "email_alerts" {
@@ -94,8 +95,11 @@ module "cluster" {
 }
 
 module "app" {
-  depends_on = [aws_ecr_repository.default_image]
-  source     = "./app"
+  depends_on = [
+    aws_ecr_repository.default_image,
+    aws_iam_openid_connect_provider.github
+  ]
+  source = "./app"
   for_each = {
     for index, app in local.apps :
     app.app_name => app
@@ -123,6 +127,9 @@ module "app" {
 }
 
 module "static_app" {
+  depends_on = [
+    aws_iam_openid_connect_provider.github
+  ]
   source = "./static_app"
   for_each = {
     for index, app in local.static_apps :

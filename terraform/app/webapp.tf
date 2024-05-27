@@ -53,6 +53,9 @@ data "aws_cloudfront_cache_policy" "disabled" {
 }
 
 resource "aws_cloudfront_distribution" "default" {
+  depends_on = [
+    data.aws_cloudfront_cache_policy.disabled
+  ]
   aliases             = local.is_subdomain ? ["${var.app_domain}.${var.subdomain_of}"] : [var.app_domain, "www.${var.app_domain}"]
   enabled             = true
   http_version        = "http2"

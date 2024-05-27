@@ -5,6 +5,6 @@ set -e
 . .env
 
 # verify identity
-aws sts get-caller-identity || aws sso login --profile=kerukion-admin
+aws sts get-caller-identity --query "Account" --profile "kerukion-admin" > /dev/null || aws sso login --profile=kerukion-admin
 
 aws --profile kerukion-admin ssm start-session --target $1
