@@ -12,4 +12,4 @@ aws sts get-caller-identity --query "Account" --profile "${AWS_PROFILE}" > /dev/
 
 aws --profile "${AWS_PROFILE}" ssm start-session --target "${INSTANCE_ID}" \
     --document-name AWS-StartPortForwardingSessionToRemoteHost \
-    --parameters host="${DB_ENDPOINT}",portNumber="5432",localPortNumber="9999"
+    --parameters host="${DB_ENDPOINT%:*}",portNumber="5432",localPortNumber="9999"

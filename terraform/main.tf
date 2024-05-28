@@ -127,7 +127,6 @@ module "app" {
   vpc_id                         = module.cluster.vpc_id
   service_discovery_namespace_id = module.cluster.service_discovery_namespace_id
   capacity_provider_name         = module.cluster.capacity_provider_name
-  subnet_ids                     = module.cluster.private_subnet_ids
   email_alert_topic_arn          = aws_sns_topic.email_alerts.arn
 }
 
@@ -183,8 +182,8 @@ output "asg_instance_ids" {
 }
 
 output "haproxy_instance_id" {
-  depends_on = [ module.haproxy ]
-  value = data.aws_instances.haproxy_instance.ids
+  depends_on = [module.haproxy]
+  value      = data.aws_instances.haproxy_instance.ids
 }
 
 output "haproxy_domain" {

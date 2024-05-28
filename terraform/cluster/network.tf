@@ -40,16 +40,6 @@ resource "aws_subnet" "private_1" {
   }
 }
 
-resource "aws_subnet" "public_2" {
-  vpc_id                  = aws_vpc.default.id
-  availability_zone       = "us-east-1c"
-  cidr_block              = cidrsubnet(local.base_cidr, 8, 2)
-  map_public_ip_on_launch = false
-  tags = {
-    Name = "public-2"
-  }
-}
-
 resource "aws_subnet" "private_2" {
   vpc_id                  = aws_vpc.default.id
   availability_zone       = "us-east-1c"
@@ -60,34 +50,8 @@ resource "aws_subnet" "private_2" {
   }
 }
 
-resource "aws_route_table_association" "private_1_route_table_association" {
-  subnet_id      = aws_subnet.private_1.id
-  route_table_id = aws_route_table.private_route_table.id
-}
-
-resource "aws_route_table_association" "private_2_route_table_association" {
-  subnet_id      = aws_subnet.private_2.id
-  route_table_id = aws_route_table.private_route_table.id
-}
-
-resource "aws_route_table" "private_route_table" {
-  vpc_id = aws_vpc.default.id
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat_gateway.id
-  }
-}
-
 resource "aws_eip" "nat_eip" {
   domain = "vpc"
-}
-
-resource "aws_nat_gateway" "nat_gateway" {
-  depends_on = [aws_internet_gateway.default]
-
-  allocation_id = aws_eip.nat_eip.id
-  subnet_id     = aws_subnet.public_1.id
 }
 
 resource "aws_security_group" "db_sg" {
@@ -126,31 +90,6 @@ resource "aws_security_group_rule" "all_ecs_egress" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.ecs_sg.id
 }
-
-# resource "aws_alb" "default" {
-#   name            = "cluster-lb"
-#   internal        = false
-#   security_groups = [aws_security_group.lb_sg.id]
-#   subnets         = [aws_subnet.public_1.id, aws_subnet.public_2.id]
-# }
-
-# resource "aws_alb_listener" "alb_listener_http" {
-#   load_balancer_arn = aws_alb.default.arn
-
-#   port     = 80
-#   protocol = "HTTP"
-
-#   default_action {
-#     type             = "fixed-response"
-#     target_group_arn = null
-
-#     fixed_response {
-#       status_code  = 404
-#       content_type = "application/json"
-#       message_body = "{\"meta\":{\"status\":404,\"version\":\"dev\"},\"error\":\"Not Found\"}"
-#     }
-#   }
-# }
 
 resource "aws_service_discovery_private_dns_namespace" "internal_service_discovery_namespace" {
   name        = "internal"

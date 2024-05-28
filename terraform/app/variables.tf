@@ -27,20 +27,8 @@ variable "service_discovery_namespace_id" {
   type = string
 }
 
-# variable "load_balancer_listener_arn" {
-#   type = string
-# }
-
-# variable "load_balancer_arn_suffix" {
-#   type = string
-# }
-
 variable "capacity_provider_name" {
   type = string
-}
-
-variable "subnet_ids" {
-  type = list(string)
 }
 
 variable "github_repo" {
