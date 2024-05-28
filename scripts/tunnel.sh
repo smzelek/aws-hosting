@@ -4,9 +4,12 @@ set -e
 # source in env vars
 . .env
 
-# verify identity
-aws sts get-caller-identity --query "Account" --profile "kerukion-admin" > /dev/null || aws sso login --profile=kerukion-admin
+INSTANCE_ID="$(terraform -chdir=terraform/ output --json | jq -r '.asg_instance_ids.value[0]')"
+DB_ENDPOINT=$(terraform -chdir=terraform/ output --json | jq -r '.rds_endpoint.value')
 
-aws --profile kerukion-admin ssm start-session --target $1 \
+# verify identity
+aws sts get-caller-identity --query "Account" --profile "${AWS_PROFILE}" > /dev/null || aws sso login --profile "${AWS_PROFILE}"
+
+aws --profile "${AWS_PROFILE}" ssm start-session --target "${INSTANCE_ID}" \
     --document-name AWS-StartPortForwardingSessionToRemoteHost \
-    --parameters host="cluster-db.cz6coaa0okhg.us-east-1.rds.amazonaws.com",portNumber="5432",localPortNumber="9999"
+    --parameters host="${DB_ENDPOINT}",portNumber="5432",localPortNumber="9999"

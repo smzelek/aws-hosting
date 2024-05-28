@@ -90,35 +90,6 @@ resource "aws_nat_gateway" "nat_gateway" {
   subnet_id     = aws_subnet.public_1.id
 }
 
-resource "aws_security_group" "lb_sg" {
-  vpc_id = aws_vpc.default.id
-  name   = "lb_sg"
-
-  ingress {
-    description = "Insecure inbound traffic."
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Secure inbound traffic."
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    description = "All outgoing traffic."
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 resource "aws_security_group" "db_sg" {
   vpc_id = aws_vpc.default.id
   name   = "db_sg"
@@ -147,15 +118,6 @@ resource "aws_security_group" "ecs_sg" {
   name   = "ecs_sg"
 }
 
-resource "aws_security_group_rule" "all_lb_to_ecs" {
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  source_security_group_id = aws_security_group.lb_sg.id
-  security_group_id        = aws_security_group.ecs_sg.id
-}
-
 resource "aws_security_group_rule" "all_ecs_egress" {
   type              = "egress"
   from_port         = 0
@@ -165,27 +127,32 @@ resource "aws_security_group_rule" "all_ecs_egress" {
   security_group_id = aws_security_group.ecs_sg.id
 }
 
-resource "aws_alb" "default" {
-  name            = "cluster-lb"
-  internal        = false
-  security_groups = [aws_security_group.lb_sg.id]
-  subnets         = [aws_subnet.public_1.id, aws_subnet.public_2.id]
-}
+# resource "aws_alb" "default" {
+#   name            = "cluster-lb"
+#   internal        = false
+#   security_groups = [aws_security_group.lb_sg.id]
+#   subnets         = [aws_subnet.public_1.id, aws_subnet.public_2.id]
+# }
 
-resource "aws_alb_listener" "alb_listener_http" {
-  load_balancer_arn = aws_alb.default.arn
+# resource "aws_alb_listener" "alb_listener_http" {
+#   load_balancer_arn = aws_alb.default.arn
 
-  port     = 80
-  protocol = "HTTP"
+#   port     = 80
+#   protocol = "HTTP"
 
-  default_action {
-    type             = "fixed-response"
-    target_group_arn = null
+#   default_action {
+#     type             = "fixed-response"
+#     target_group_arn = null
 
-    fixed_response {
-      status_code  = 404
-      content_type = "application/json"
-      message_body = "{\"meta\":{\"status\":404,\"version\":\"dev\"},\"error\":\"Not Found\"}"
-    }
-  }
+#     fixed_response {
+#       status_code  = 404
+#       content_type = "application/json"
+#       message_body = "{\"meta\":{\"status\":404,\"version\":\"dev\"},\"error\":\"Not Found\"}"
+#     }
+#   }
+# }
+
+resource "aws_service_discovery_private_dns_namespace" "internal_service_discovery_namespace" {
+  name        = "internal"
+  vpc         = aws_vpc.default.id
 }

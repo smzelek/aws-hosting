@@ -2,3 +2,6 @@
 *.tfstate
 *.tfstate.backup
 generated_resources.tf
+certs/*
+*.pem
+.env

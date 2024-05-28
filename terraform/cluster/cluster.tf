@@ -61,7 +61,7 @@ resource "aws_autoscaling_group" "autoscaling_group" {
 
 resource "aws_launch_template" "cluster_instance_template" {
   name_prefix = "cluster_instance"
-  # image_id = aws --profile kerukion-admin ssm get-parameters --names /aws/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended/image_id
+  # image_id = aws --profile "${AWS_PROFILE}" ssm get-parameters --names /aws/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended/image_id | jq '.Parameters[0].Value'
   image_id               = "ami-0046cbbe25829d3a8"
   instance_type          = "t4g.small"
   update_default_version = true
@@ -142,4 +142,3 @@ resource "aws_cloudwatch_metric_alarm" "memory_alarm" {
     ClusterName = aws_ecs_cluster.cluster.name
   }
 }
-

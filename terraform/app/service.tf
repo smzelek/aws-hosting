@@ -37,61 +37,84 @@ resource "aws_cloudwatch_log_group" "default" {
   retention_in_days = 365
 }
 
-resource "aws_lb_listener_rule" "alb_listener_rule_http" {
-  listener_arn = var.load_balancer_listener_arn
+# resource "aws_lb_listener_rule" "alb_listener_rule_http" {
+#   listener_arn = var.load_balancer_listener_arn
 
-  action {
-    target_group_arn = aws_lb_target_group.target_group.arn
-    type             = "forward"
-  }
+#   action {
+#     target_group_arn = aws_lb_target_group.target_group.arn
+#     type             = "forward"
+#   }
 
-  condition {
-    host_header {
-      values = [
-        local.is_subdomain ? "${var.api_domain}.${var.subdomain_of}" : var.api_domain
-      ]
+#   condition {
+#     host_header {
+#       values = [
+#         local.is_subdomain ? "${var.api_domain}.${var.subdomain_of}" : var.api_domain
+#       ]
+#     }
+#   }
+# }
+
+# resource "aws_lb_target_group" "target_group" {
+#   name                 = local.fq_app_name
+#   port                 = 80
+#   protocol             = "HTTP"
+#   target_type          = "instance"
+#   vpc_id               = var.vpc_id
+#   deregistration_delay = "5"
+
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+
+#   health_check {
+#     matcher             = "200-399"
+#     path                = "/elb-status"
+#     interval            = "15"
+#     healthy_threshold   = "4"
+#     unhealthy_threshold = "4"
+#     timeout             = "10"
+#   }
+# }
+
+resource "aws_service_discovery_service" "service_discovery" {
+  name         = "_${local.fq_app_name}"
+  namespace_id = var.service_discovery_namespace_id
+
+  dns_config {
+    namespace_id   = var.service_discovery_namespace_id
+    routing_policy = "MULTIVALUE"
+
+    dns_records {
+      ttl  = 15
+      type = "SRV"
     }
   }
-}
 
-resource "aws_lb_target_group" "target_group" {
-  name                 = local.fq_app_name
-  port                 = 80
-  protocol             = "HTTP"
-  target_type          = "instance"
-  vpc_id               = var.vpc_id
-  deregistration_delay = "5"
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  health_check {
-    matcher             = "200-399"
-    path                = "/elb-status"
-    interval            = "15"
-    healthy_threshold   = "4"
-    unhealthy_threshold = "4"
-    timeout             = "10"
+  health_check_custom_config {
+    failure_threshold = 1
   }
 }
 
 resource "aws_ecs_service" "service" {
+  depends_on = [
+    aws_service_discovery_service.service_discovery
+  ]
+
   name            = local.fq_app_name
   cluster         = var.cluster_arn
   task_definition = aws_ecs_task_definition.task_definition.arn
-  desired_count   = 1
+  desired_count   = 2
+
+  service_registries {
+    container_name = local.fq_app_name
+    container_port = 80
+    registry_arn   = aws_service_discovery_service.service_discovery.arn
+  }
 
   capacity_provider_strategy {
     base              = 1
     weight            = 100
     capacity_provider = var.capacity_provider_name
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.target_group.arn
-    container_name   = local.fq_app_name
-    container_port   = 80
   }
 
   ordered_placement_strategy {

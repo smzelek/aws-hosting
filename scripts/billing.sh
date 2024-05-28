@@ -5,12 +5,12 @@ set -e
 . .env
 
 # verify identity
-aws sts get-caller-identity --query "Account" --profile "kerukion-admin" > /dev/null || aws sso login --profile=kerukion-admin
+aws sts get-caller-identity --query "Account" --profile "${AWS_PROFILE}" > /dev/null || aws sso login --profile "${AWS_DEFAULT_PROFILE}"
 
 echo "--- VPC ---"
-echo '$0.005 per In-use public IPv4 address per hour ($3.72/mo):'
+echo '$0.005 per In-use public IPv4 address per hour ($3.72/mo): -> $11.16'
 aws ec2 describe-network-interfaces \
-    --query 'NetworkInterfaces[*].{ id: NetworkInterfaceId, vpc_id: VpcId, subnet_id: SubnetId, status: Status, az: AvailabilityZone, type: InterfaceType, requester: RequesterId, public_ip: Association.PublicIp }' \
+    --query 'NetworkInterfaces[?not_null(Association.PublicIp)].{ id: NetworkInterfaceId, vpc_id: VpcId, subnet_id: SubnetId, status: Status, az: AvailabilityZone, type: InterfaceType, requester: RequesterId, public_ip: Association.PublicIp }' \
     --output table
 echo
 
@@ -20,6 +20,7 @@ aws ec2 describe-nat-gateways \
     --query 'NatGateways[*].{ id: NatGatewayId, state: State }' \
     --output table
 echo '$0.0168 per On Demand Linux t4g.small Instance hour ($12.49/mo):'
+echo '$0.0042 per On Demand Linux t4g.nano Instance hour ($3.13/mo):'
 aws ec2 describe-instances \
     --query 'Reservations[*].Instances[*].{ id: InstanceId, type: InstanceType, state: State.Name, public_ip: PublicIpAddress }' \
     --output table

@@ -31,24 +31,24 @@ locals {
       app_domain   = "guildvaults.com"
       api_domain   = "api.guildvaults.com"
       subdomain_of = ""
-      bootstrap    = true
+      bootstrap    = false
     },
-    {
-      app_name     = "ticmetactoe-com"
-      github_repo  = "smzelek/ticmetactoe.com"
-      app_domain   = "ticmetactoe.com"
-      api_domain   = "api.ticmetactoe.com"
-      subdomain_of = ""
-      bootstrap    = true
-    },
-    {
-      app_name     = "raidtimers-com"
-      github_repo  = "smzelek/raidtimers.com"
-      app_domain   = "raidtimers.com"
-      api_domain   = "api.raidtimers.com"
-      subdomain_of = ""
-      bootstrap    = true
-    },
+    # {
+    #   app_name     = "ticmetactoe-com"
+    #   github_repo  = "smzelek/ticmetactoe.com"
+    #   app_domain   = "ticmetactoe.com"
+    #   api_domain   = "api.ticmetactoe.com"
+    #   subdomain_of = ""
+    #   bootstrap    = true
+    # },
+    # {
+    #   app_name     = "raidtimers-com"
+    #   github_repo  = "smzelek/raidtimers.com"
+    #   app_domain   = "raidtimers.com"
+    #   api_domain   = "api.raidtimers.com"
+    #   subdomain_of = ""
+    #   bootstrap    = true
+    # },
   ]
 
   static_apps = [
@@ -94,6 +94,13 @@ module "cluster" {
   email_alert_topic_arn = aws_sns_topic.email_alerts.arn
 }
 
+module "haproxy" {
+  source                = "./haproxy"
+  vpc_id                = module.cluster.vpc_id
+  public_subnet_id      = module.cluster.public_subnet_id
+  ecs_security_group_id = module.cluster.ecs_security_group_id
+}
+
 module "app" {
   depends_on = [
     aws_ecr_repository.default_image,
@@ -114,16 +121,14 @@ module "app" {
   subdomain_of = each.value.subdomain_of
 
   # universal cluster values
-  cluster_arn                = module.cluster.cluster_arn
-  cluster_name               = module.cluster.cluster_name
-  autoscaling_group_name     = module.cluster.autoscaling_group_name
-  vpc_id                     = module.cluster.vpc_id
-  load_balancer_listener_arn = module.cluster.load_balancer_listener_arn
-  load_balancer_arn_suffix   = module.cluster.load_balancer_arn_suffix
-  capacity_provider_name     = module.cluster.capacity_provider_name
-  subnet_ids                 = module.cluster.private_subnet_ids
-  ecs_security_group_ids     = module.cluster.ecs_security_group_ids
-  email_alert_topic_arn      = aws_sns_topic.email_alerts.arn
+  cluster_arn                    = module.cluster.cluster_arn
+  cluster_name                   = module.cluster.cluster_name
+  autoscaling_group_name         = module.cluster.autoscaling_group_name
+  vpc_id                         = module.cluster.vpc_id
+  service_discovery_namespace_id = module.cluster.service_discovery_namespace_id
+  capacity_provider_name         = module.cluster.capacity_provider_name
+  subnet_ids                     = module.cluster.private_subnet_ids
+  email_alert_topic_arn          = aws_sns_topic.email_alerts.arn
 }
 
 module "static_app" {
@@ -148,7 +153,13 @@ data "aws_instances" "asg_instances" {
   }
 }
 
-output "_1_app_links" {
+data "aws_instances" "haproxy_instance" {
+  instance_tags = {
+    Name = "haproxy"
+  }
+}
+
+output "app_links" {
   value = {
     for app in local.apps : app.app_name => {
       certificate_link  = module.app[app.app_name].certificate_link
@@ -158,7 +169,7 @@ output "_1_app_links" {
   }
 }
 
-output "_2_static_app_links" {
+output "static_app_links" {
   value = {
     for app in local.static_apps : app.app_name => {
       certificate_link  = module.static_app[app.app_name].certificate_link
@@ -167,18 +178,24 @@ output "_2_static_app_links" {
   }
 }
 
-output "_3_load_balancer_domain" {
-  value = module.cluster.load_balancer_domain
-}
-
-output "_4_instance_ids" {
+output "asg_instance_ids" {
   value = data.aws_instances.asg_instances.ids
 }
 
-output "_5_rds_endpoint" {
+output "haproxy_instance_id" {
+  depends_on = [ module.haproxy ]
+  value = data.aws_instances.haproxy_instance.ids
+}
+
+output "haproxy_domain" {
+  value = module.haproxy.haproxy_domain
+}
+
+output "rds_endpoint" {
   value = module.cluster.rds_endpoint
 }
 
-output "_6_rds_password" {
+output "rds_password" {
   value = nonsensitive(module.cluster.rds_password)
 }
+

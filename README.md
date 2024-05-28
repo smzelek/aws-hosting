@@ -26,11 +26,12 @@ bash ./scripts/ssh.sh <instance_id>
 
 ## Build and push docker default-image
 ```bash
+(. .env && \
 ECR_URL="590184101838.dkr.ecr.us-east-1.amazonaws.com" \
 ECR_TAG="${ECR_URL}/default-image:latest" \
-aws --profile kerukion-admin ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "${ECR_URL}" && \
+aws --profile "${AWS_PROFILE}" ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "${ECR_URL}" && \
 sudo docker build default_image/ -t "${ECR_TAG}" && \
-sudo docker push "${ECR_TAG}"
+sudo docker push "${ECR_TAG}")
 ```
 
 ## Connect to RDS DB
