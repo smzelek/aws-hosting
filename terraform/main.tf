@@ -33,22 +33,22 @@ locals {
       subdomain_of = ""
       bootstrap    = false
     },
-    # {
-    #   app_name     = "ticmetactoe-com"
-    #   github_repo  = "smzelek/ticmetactoe.com"
-    #   app_domain   = "ticmetactoe.com"
-    #   api_domain   = "api.ticmetactoe.com"
-    #   subdomain_of = ""
-    #   bootstrap    = true
-    # },
-    # {
-    #   app_name     = "raidtimers-com"
-    #   github_repo  = "smzelek/raidtimers.com"
-    #   app_domain   = "raidtimers.com"
-    #   api_domain   = "api.raidtimers.com"
-    #   subdomain_of = ""
-    #   bootstrap    = true
-    # },
+    {
+      app_name     = "ticmetactoe-com"
+      github_repo  = "smzelek/ticmetactoe.com"
+      app_domain   = "ticmetactoe.com"
+      api_domain   = "api.ticmetactoe.com"
+      subdomain_of = ""
+      bootstrap    = false
+    },
+    {
+      app_name     = "raidtimers-com"
+      github_repo  = "smzelek/raidtimers.com"
+      app_domain   = "raidtimers.com"
+      api_domain   = "api.raidtimers.com"
+      subdomain_of = ""
+      bootstrap    = false
+    },
   ]
 
   static_apps = [

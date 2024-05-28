@@ -1,5 +1,7 @@
 #!/bin/bash
 set -e
+set -E
+set -o pipefail
 
 # source in env vars
 . .env

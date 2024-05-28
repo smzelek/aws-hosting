@@ -92,6 +92,6 @@ resource "aws_security_group_rule" "all_ecs_egress" {
 }
 
 resource "aws_service_discovery_private_dns_namespace" "internal_service_discovery_namespace" {
-  name        = "internal"
-  vpc         = aws_vpc.default.id
+  name = "internal"
+  vpc  = aws_vpc.default.id
 }
