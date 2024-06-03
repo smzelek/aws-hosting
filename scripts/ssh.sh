@@ -7,6 +7,9 @@ set -o pipefail
 . .env
 TARGET="${1}"
 
+# verify identity
+aws sts get-caller-identity --query "Account" > /dev/null || aws sso login
+
 if [[ "${TARGET}" == "haproxy" ]]; then
     INSTANCE_ID="$(terraform -chdir=terraform/ output --json | jq -r '.haproxy_instance_id.value[0]')"
 elif [[ "${TARGET}" == "cluster" ]]; then
@@ -15,7 +18,4 @@ else
     INSTANCE_ID="${TARGET}"
 fi
 
-# verify identity
-aws sts get-caller-identity --query "Account" --profile "${AWS_PROFILE}" > /dev/null || aws sso login --profile "${AWS_PROFILE}"
-
-aws --profile "${AWS_PROFILE}" ssm start-session --target "${INSTANCE_ID}"
+aws ssm start-session --target "${INSTANCE_ID}"

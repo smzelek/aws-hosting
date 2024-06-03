@@ -7,7 +7,7 @@ set -o pipefail
 . .env
 
 # verify identity
-aws sts get-caller-identity --query "Account" --profile "${AWS_PROFILE}" > /dev/null || aws sso login --profile "${AWS_DEFAULT_PROFILE}"
+aws sts get-caller-identity --query "Account" > /dev/null || aws sso login --profile "${AWS_DEFAULT_PROFILE}"
 
 echo '--- RDS ---'
 echo '-----------'
@@ -37,6 +37,11 @@ echo '$0.045 per NAT Gateway Hour ($33.48/mo):'
 aws ec2 describe-nat-gateways \
     --query 'NatGateways[*].{ id: NatGatewayId, state: State }' \
     --output table
+echo -e ""
+echo '$1.45 per EBS Volume ($2.90/mo):'
+aws ec2 describe-volumes \
+    --query 'Volumes[?State == `in-use`].{ id: VolumeId, state: State, instanceIds: join(`, `, Attachments[].InstanceId) }' \
+    --output table
 echo -e "\n\n"
 
 echo '--- ELB ---'
@@ -47,5 +52,17 @@ aws elbv2 describe-load-balancers \
     --output table
 echo -e "\n\n"
 
+echo '--- Cloudwatch ---'
+echo '-----------'
+echo '$0.30 per Cloudwatch Custom Metric ($9.90/mo):'
+echo "Custom metric count: $(aws cloudwatch list-metrics \
+    --namespace "ECS/ContainerInsights" \
+    --query "Metrics[?Dimensions[?Name=='ServiceName']]" \
+    | jq '. | length')"
+aws cloudwatch list-metrics \
+    --namespace "ECS/ContainerInsights" \
+    --query "Metrics[?Dimensions[?Name=='ServiceName']].{ namespace: Namespace, metric: MetricName, service: join(', ', Dimensions[?Name == 'ServiceName'].Value) } | sort_by(@, &service)" \
+    --output table
+echo -e "\n\n"
 
-echo 'Total: $36.45'
+echo 'Total: $49.25'

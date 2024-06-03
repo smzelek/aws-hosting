@@ -4,7 +4,7 @@ set -E
 set -o pipefail
 
 . .env
-aws sts get-caller-identity --query "Account" --profile "${AWS_PROFILE}" > /dev/null || aws sso login --profile "${AWS_PROFILE}"
+aws sts get-caller-identity --query "Account" > /dev/null || aws sso login
 
 DOMAIN="${1}"
 certbot certonly \
