@@ -47,9 +47,26 @@ resource "aws_iam_role_policy" "github_role_policy" {
         Action = [
           "ecs:RegisterTaskDefinition",
           "ecs:DescribeTaskDefinition",
-          "ecr:GetAuthorizationToken"
+          "ecr:GetAuthorizationToken",
+          "ecs:DescribeTasks",
         ],
         Resource = ["*"]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "ecs:RunTask"
+        ],
+        Resource = ["${aws_ecs_task_definition.command_task_definition.arn_without_revision}:*"]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:FilterLogEvents",
+          "logs:StartLiveTail",
+          "logs:StopLiveTail",
+        ],
+        Resource = ["${aws_cloudwatch_log_group.command.arn}:*"]
       },
       {
         Effect = "Allow",

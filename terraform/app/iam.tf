@@ -49,7 +49,6 @@ resource "aws_iam_role_policy_attachment" "task_role_policy_attachment" {
   policy_arn = aws_iam_policy.task_role_policy.arn
 }
 
-# unused
 resource "aws_iam_policy" "task_role_policy" {
   name = "${local.fq_app_name}-task-role-policy"
   policy = jsonencode({

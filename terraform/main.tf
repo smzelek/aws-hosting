@@ -197,4 +197,3 @@ output "rds_endpoint" {
 output "rds_password" {
   value = nonsensitive(module.cluster.rds_password)
 }
-

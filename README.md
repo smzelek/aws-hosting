@@ -29,7 +29,7 @@ bash ./scripts/ssh.sh <instance_id>
 (. .env && \
 ECR_URL="590184101838.dkr.ecr.us-east-1.amazonaws.com" \
 ECR_TAG="${ECR_URL}/default-image:latest" \
-aws --profile "${AWS_PROFILE}" ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "${ECR_URL}" && \
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "${ECR_URL}" && \
 sudo docker build default_image/ -t "${ECR_TAG}" && \
 sudo docker push "${ECR_TAG}")
 ```
@@ -39,3 +39,13 @@ sudo docker push "${ECR_TAG}")
 bash ./scripts/tunnel.sh <instance-id>
 # open PGAdmin and connect to 127.0.0.1:9999
 ```
+
+## Cost-saving notes
+* got rid of NAT gateway ($33/mo). it was required to allow the private subnet to hit the internet
+* so, got rid of private subnet, moved vpc into public subnet
+* added a public IP to the EC2 cluster ($3.50/mo)
+
+* got rid of AWS ALB, target groups ($17/mo)
+* ALB also requires 2 subnets, only have 1 now
+* setup HAProxy in the EC2 cluster as a stand-in for AWS ALB ($0)
+
