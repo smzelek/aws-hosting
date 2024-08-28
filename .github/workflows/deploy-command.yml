@@ -57,7 +57,7 @@ jobs:
             --cache-from type=registry,ref="${{ env.CACHE_TAG }}" \
             -t "${{ env.IMAGE_TAG }}" \
             -f "${{ inputs.dockerfile }}" .
-          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+          echo "image=${IMAGE_TAG}" >> $GITHUB_OUTPUT
       - name: Render Amazon ECS Task Definition
         id: render-task-definition
         uses: aws-actions/amazon-ecs-render-task-definition@v1
