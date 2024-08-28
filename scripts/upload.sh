@@ -22,5 +22,6 @@ echo
 echo
 echo "Update haproxy certs:"
 echo "bash scripts/ssh.sh haproxy"
-echo "cd ~ && bash ~/setup.sh"
+echo "cd ~ && aws s3 sync s3://kerukion-haproxy-config/ ~"
+echo "bash ~/update_certs.sh"
 echo

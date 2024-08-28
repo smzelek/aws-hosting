@@ -1,5 +1,6 @@
 # aws-hosting
 
+## Architecture
 This repo represents my new theory of service management (as opposed to Appflow work):
 * Code/secrets/infra will not be atomically committed together.
 * Code will be in its own service repo.
@@ -19,12 +20,22 @@ Reasoning:
 
 At the very least, this makes a lot more sense as a go-to for boilerplate webapp services --- if a service has way more need for dealing with AWS hands on, it could bring in Terraform at that point when it makes sense for the repo's domain.
 
-## Start local CLI ssh session on instance
+### Cost-saving notes
+* got rid of NAT gateway ($33/mo). it was required to allow the private subnet to hit the internet
+* so, got rid of private subnet, moved vpc into public subnet
+* added a public IP to the EC2 cluster ($3.50/mo)
+
+* got rid of AWS ALB, target groups ($17/mo)
+* ALB also requires 2 subnets, only have 1 now
+* setup HAProxy in the EC2 cluster as a stand-in for AWS ALB ($0)
+
+## Instructions
+### Start local CLI ssh session on instance
 ```bash
 bash ./scripts/ssh.sh <instance_id>
 ```
 
-## Build and push docker default-image
+### Build and push docker default-image
 ```bash
 (. .env && \
 ECR_URL="590184101838.dkr.ecr.us-east-1.amazonaws.com" \
@@ -34,18 +45,21 @@ sudo docker build default_image/ -t "${ECR_TAG}" && \
 sudo docker push "${ECR_TAG}")
 ```
 
-## Connect to RDS DB
+### Connect to RDS DB
 ```bash
 bash ./scripts/tunnel.sh <instance-id>
 # open PGAdmin and connect to 127.0.0.1:9999
 ```
 
-## Cost-saving notes
-* got rid of NAT gateway ($33/mo). it was required to allow the private subnet to hit the internet
-* so, got rid of private subnet, moved vpc into public subnet
-* added a public IP to the EC2 cluster ($3.50/mo)
+### Renew certs
+```bash
+# per-domain
+dig txt _acme-challenge.ticmetactoe.com @8.8.8.8
+bash scripts/make_cert.sh ticmetactoe.com
 
-* got rid of AWS ALB, target groups ($17/mo)
-* ALB also requires 2 subnets, only have 1 now
-* setup HAProxy in the EC2 cluster as a stand-in for AWS ALB ($0)
-
+# finally
+bash scripts/upload.sh
+bash scripts/ssh.sh haproxy
+cd ~ && aws s3 sync s3://kerukion-haproxy-config/ ~
+bash ~/update_certs.sh
+```

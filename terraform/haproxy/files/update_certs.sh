@@ -9,6 +9,7 @@ NC="\033[0m"
 
 echo -e "${BLUE}Setting up cert pem files for haproxy:${NC}"
 sudo cp ~/*.pem /etc/haproxy/certs/
+sudo rm /etc/haproxy/certs/haproxy.pem
 ls -al /etc/haproxy/certs/
 echo -e "\n"
 
