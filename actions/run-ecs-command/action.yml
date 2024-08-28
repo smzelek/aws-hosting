@@ -16,5 +16,5 @@ runs:
       env:
         TASK_DEFINITION_JSON_FILE: ${{ inputs.task-definition-json-file }}
         CLUSTER_NAME: ${{ inputs.cluster-name }}
-      run: bash ./.github/actions/run-ecs-command/run-ecs-command.sh
+      run: bash ./.github/actions/actions/run-ecs-command/run-ecs-command.sh
       shell: bash
