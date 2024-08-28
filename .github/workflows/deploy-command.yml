@@ -30,6 +30,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Checkout Actions
+        uses: actions/checkout@v4
+        with:
+          repository: smzelek/aws-hosting
+          ref: main
+          path: .github/actions
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -48,8 +54,8 @@ jobs:
         id: docker
         shell: bash
         env: 
-          IMAGE_TAG: "${{ steps.login-ecr.outputs.registry }}/${{ inputs.aws-app }}:${{ github.sha }}"
-          CACHE_TAG: "${{ steps.login-ecr.outputs.registry }}/${{ inputs.aws-app }}:cache"
+          IMAGE_TAG: "${{ steps.login-ecr.outputs.registry }}/${{ inputs.aws-app }}:command-${{ github.sha }}"
+          CACHE_TAG: "${{ steps.login-ecr.outputs.registry }}/${{ inputs.aws-app }}:command-cache"
         run: |
           docker buildx build --push \
             --platform linux/arm64 \
@@ -67,7 +73,7 @@ jobs:
           image: "${{ steps.docker.outputs.image }}"
           command: ${{ inputs.command }}
       - name: Run Amazon ECS task definition
-        uses: ./.github/actions/run-ecs-command
+        uses: ./.github/actions/actions/run-ecs-command
         with:
           task-definition-json-file: "${{ steps.render-task-definition.outputs.task-definition }}"
           cluster-name: "${{ env.AWS_ECS_CLUSTER }}"
