@@ -10,6 +10,7 @@ NC='\033[0m'
 
 sudo apt-get install -y expect
 
+echo $(cat "${TASK_DEFINITION_JSON_FILE}" | jq 'del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities) | del(.registeredAt) | del(.registeredBy)') > "${TASK_DEFINITION_JSON_FILE}"
 task_definition_arn=$(aws ecs register-task-definition --cli-input-json "file://${TASK_DEFINITION_JSON_FILE}" | jq -r '.taskDefinition.taskDefinitionArn')
 printf "Registered new task definition with arn: ${GREEN}${task_definition_arn}${NC}.\n"
 
@@ -37,5 +38,5 @@ printf "${GREEN}Done!${NC}\n"
 sleep 6 # allow final polling period of aws logs tail
 exit_code=$(aws ecs describe-tasks --cluster "${CLUSTER_NAME}" --tasks "${task_arn}" --query "tasks[0].containers[0].exitCode" --output text)
 printf "Task ${BLUE}${task_arn}${NC} exited with code: ${YELLOW}${exit_code}${NC}.\n"
- 
+
 exit "${exit_code}"
