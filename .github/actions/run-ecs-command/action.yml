@@ -1,0 +1,20 @@
+name: Run ECS command
+description: Run an ECS Command
+
+inputs:
+  task-definition-json-file:
+    description: File containing JSON task definition to run [required]
+    required: true
+  cluster-name:
+    description: ECS cluster to run the task on [required]
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Run ECS command
+      env:
+        TASK_DEFINITION_JSON_FILE: ${{ inputs.task-definition-json-file }}
+        CLUSTER_NAME: ${{ inputs.cluster-name }}
+      run: bash ./.github/actions/run-ecs-command/run-ecs-command.sh
+      shell: bash

@@ -1,4 +1,4 @@
-name: Deploy service
+name: Deploy command
 # Requires secrets:
 # GITHUB_TOKEN
 
@@ -11,6 +11,9 @@ on:
   workflow_call:
     # Requires secrets: inherit
     inputs:
+      command:
+        required: true
+        type: string
       dockerfile:
         required: true
         type: string
@@ -30,14 +33,14 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ inputs.aws-app }}-github-role
-          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: "arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ inputs.aws-app }}-github-role"
+          aws-region: "${{ env.AWS_REGION }}"
           mask-aws-account-id: 'no'
       - name: Login to ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
         with:
-          registries: ${{ env.AWS_ACCOUNT_ID }}
+          registries: "${{ env.AWS_ACCOUNT_ID }}"
           mask-password: "true"
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -54,18 +57,17 @@ jobs:
             --cache-from type=registry,ref="${{ env.CACHE_TAG }}" \
             -t "${{ env.IMAGE_TAG }}" \
             -f "${{ inputs.dockerfile }}" .
-          echo "image=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
       - name: Render Amazon ECS Task Definition
-        id: task-definition
+        id: render-task-definition
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition-family: "${{ inputs.aws-app }}"
-          container-name: ${{ inputs.aws-app }}
-          image: ${{ steps.docker.outputs.image }}
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+          task-definition-family: "${{ inputs.aws-app }}-command"
+          container-name: "${{ inputs.aws-app }}-command"
+          image: "${{ steps.docker.outputs.image }}"
+          command: ${{ inputs.command }}
+      - name: Run Amazon ECS task definition
+        uses: ./.github/actions/run-ecs-command
         with:
-          task-definition: ${{ steps.task-definition.outputs.task-definition }}
-          service: ${{ inputs.aws-app }}
-          cluster: ${{ env.AWS_ECS_CLUSTER }}
-          wait-for-service-stability: false
+          task-definition-json-file: "${{ steps.render-task-definition.outputs.task-definition }}"
+          cluster-name: "${{ env.AWS_ECS_CLUSTER }}"

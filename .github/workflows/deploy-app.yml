@@ -22,7 +22,7 @@ on:
         type: string
 
 jobs:
-  deploy-app:
+  deploy:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
