@@ -1,6 +1,6 @@
 resource "aws_instance" "haproxy" {
   ami                         = "ami-0046cbbe25829d3a8"
-  instance_type               = "t4g.nano"
+  instance_type               = "t4g.micro"
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.haproxy_sg.id]
   subnet_id                   = var.public_subnet_id
@@ -44,6 +44,15 @@ data "aws_iam_policy_document" "haproxy_instance_policy_document" {
   statement {
     actions = [
       "route53:ListHostedZones",
+    ]
+    resources = [
+      "*"
+    ]
+  }
+  statement {
+    actions = [
+      "ecs:DescribeServices",
+      "cloudwatch:PutMetricData",
     ]
     resources = [
       "*"

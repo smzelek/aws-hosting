@@ -1,0 +1,4 @@
+# At every 5th minute.
+# */5 * * * * ~/alarm.sh >> ~/admin.log 2>&1
+# At minute 0 past every hour.
+# 0 * * * * ~/cleanup.sh >> ~/admin.log 2>&1
