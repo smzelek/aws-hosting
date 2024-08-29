@@ -23,12 +23,12 @@ printf "Waiting for task to start... "
 aws ecs wait tasks-running --cluster "${CLUSTER_NAME}" --tasks "${task_arn}" &>/dev/null ||: # wait for start, ignore "already stopped" error
 printf "${GREEN}Done!${NC}\n"
 
-log_conf_json=$(cat "${TASK_DEFINITION_JSON_FILE}" | jq '.taskDefinition.containerDefinitions[0].logConfiguration.options')
+log_conf_json=$(cat "${TASK_DEFINITION_JSON_FILE}" | jq '.containerDefinitions[0].logConfiguration.options')
 log_stream_prefix=$(echo $log_conf_json | jq -r '.["awslogs-stream-prefix"]')
 log_group=$(echo $log_conf_json | jq -r '.["awslogs-group"]')
 log_stream="${log_stream_prefix}/${log_group}/${task_id}"
 
-printf "Tailing output of task ${BLUE}${task_id}${NC} for from Cloudwatch group: ${GREEN}${log_group}${NC}, stream: ${GREEN}${log_stream}${NC}.\n"
+printf "Tailing output of task ${BLUE}${task_id}${NC} from Cloudwatch group: ${GREEN}${log_group}${NC}, stream: ${GREEN}${log_stream}${NC}.\n"
 unbuffer aws logs tail "${log_group}" --log-stream-names "${log_stream}" --since 30m --follow &
 
 printf "Waiting for task to finish... "
