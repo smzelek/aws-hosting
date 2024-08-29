@@ -72,6 +72,9 @@ jobs:
           container-name: "${{ inputs.aws-app }}-command"
           image: "${{ steps.docker.outputs.image }}"
           command: ${{ inputs.command }}
+      - name: Preview Amazon ECS Task Definition
+        run: |
+          cat ${{ steps.render-task-definition.outputs.task-definition }}
       - name: Run Amazon ECS task definition
         uses: ./.github/actions/actions/run-ecs-command
         with:
