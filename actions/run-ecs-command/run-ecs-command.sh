@@ -23,7 +23,7 @@ printf "Waiting for task to start... "
 aws ecs wait tasks-running --cluster "${CLUSTER_NAME}" --tasks "${task_arn}" &>/dev/null ||: # wait for start, ignore "already stopped" error
 printf "${GREEN}Done!${NC}\n"
 
-log_conf_json=$(aws ecs describe-task-definition --task-definition raidtimers-com-command | jq '.taskDefinition.containerDefinitions[0].logConfiguration.options')
+log_conf_json=$(cat "${TASK_DEFINITION_JSON_FILE}" | jq '.taskDefinition.containerDefinitions[0].logConfiguration.options')
 log_stream_prefix=$(echo $log_conf_json | jq -r '.["awslogs-stream-prefix"]')
 log_group=$(echo $log_conf_json | jq -r '.["awslogs-group"]')
 log_stream="${log_stream_prefix}/${log_group}/${task_id}"

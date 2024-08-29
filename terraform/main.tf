@@ -18,13 +18,14 @@ provider "aws" {
 
 locals {
   apps = [
-    # {
-    #   app_name    = "gratzi-io"
-    #   github_repo = "smzelek/gratzi.io"
-    #   app_domain  = "gratzi.io"
-    #   api_domain  = "api-new.gratzi.io"
-    #   bootstrap   = false
-    # },
+    {
+      app_name    = "gratzi-io"
+      github_repo = "smzelek/gratzi.io"
+      app_domain  = "gratzi.io"
+      api_domain  = "api.gratzi.io"
+      subdomain_of = ""
+      bootstrap   = false
+    },
     {
       app_name     = "guildvaults-com"
       github_repo  = "smzelek/guildvaults.com"

@@ -59,7 +59,16 @@ bash scripts/make_cert.sh ticmetactoe.com
 
 # finally
 bash scripts/upload.sh
-bash scripts/ssh.sh haproxy
-cd ~ && aws s3 sync s3://kerukion-haproxy-config/ ~
-bash ~/update_certs.sh
 ```
+
+## Current cost to run:
+> Total: $47.19/mo
+
+| Resource                     | Cost                  | Description |
+|------------------------------|-----------------------|-------------|
+| 1 RDS db.t3.micro instance   | $13.39/mo             | database    |
+| 1 EC2 t4g.micro instance     | $6.24/mo              | haproxy     |
+| 1 EC2 t4g.small instance     | $12.49/mo             | cluster     |
+| 2 ENI public IPv4            | $3.72/mo => $7.44/mo  |             |
+| 2 EBS gp3 volumes            | $1.45/mo => $2.90/mo  |             |
+| 33 Cloudwatch custom metrics | $0.30/mo => $9.90/mo  |             |
