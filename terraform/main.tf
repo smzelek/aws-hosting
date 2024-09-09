@@ -60,6 +60,12 @@ locals {
       subdomain_of = ""
     },
     {
+      app_name     = "wow"
+      github_repo  = "smzelek/wow"
+      app_domain   = "wow"
+      subdomain_of = "stevezelek.com"
+    },
+    {
       app_name     = "pokegrader-com"
       github_repo  = "smzelek/pokegrader.com"
       app_domain   = "pokegrader.com"

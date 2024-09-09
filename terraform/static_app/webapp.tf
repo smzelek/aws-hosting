@@ -3,6 +3,11 @@ resource "aws_s3_bucket" "default" {
   force_destroy = true
 }
 
+data "aws_s3_bucket" "parent_bucket" {
+  count        = var.subdomain_of != "" ? 1 : 0
+  bucket = local.parent_app_name
+}
+
 resource "aws_s3_bucket_public_access_block" "default" {
   bucket = aws_s3_bucket.default.id
 

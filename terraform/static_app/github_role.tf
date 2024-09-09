@@ -23,6 +23,18 @@ data "aws_iam_policy_document" "github_oidc_repo_role" {
       values   = ["sts.amazonaws.com"]
     }
   }
+
+  # Allow the admin role to assume this role
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:sts::590184101838:assumed-role/AWSReservedSSO_AdministratorAccess_9350880fda180525/kerukion-smzelek"] # Replace AdminRole with the ARN or role name of the admin
+    }
+
+    effect = "Allow"
+  }
 }
 
 
@@ -40,8 +52,39 @@ resource "aws_iam_role_policy" "github_role_policy" {
         Effect = "Allow",
         Action = [
           "s3:PutObject",
+          "s3:ListBucket",
+          "s3:GetObject",
         ],
         Resource = ["${aws_s3_bucket.default.arn}/*"]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "github_role_policy_parent_access" {
+  count        = var.subdomain_of != "" ? 1 : 0
+  role = aws_iam_role.github_role.name
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:ListBucket",
+        ],
+        Resource = [
+          "${data.aws_s3_bucket.parent_bucket[0].arn}",
+        ]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+        ],
+        Resource = [
+          "${data.aws_s3_bucket.parent_bucket[0].arn}/files/*"
+        ]
       },
     ]
   })
