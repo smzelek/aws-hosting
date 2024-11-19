@@ -25,10 +25,10 @@ resource "aws_db_instance" "default" {
   allocated_storage            = 20
   max_allocated_storage        = 1000
   apply_immediately            = true
-  storage_type                 = "gp2"
+  storage_type                 = "gp3"
   engine                       = "postgres"
-  engine_version               = "16.2"
-  instance_class               = "db.t3.micro"
+  engine_version               = "16.3"
+  instance_class               = "db.t4g.micro"
   identifier                   = "cluster-db"
   username                     = "postgres"
   password                     = random_password.master_password.result
