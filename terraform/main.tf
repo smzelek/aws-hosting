@@ -19,12 +19,12 @@ provider "aws" {
 locals {
   apps = [
     {
-      app_name    = "gratzi-io"
-      github_repo = "smzelek/gratzi.io"
-      app_domain  = "gratzi.io"
-      api_domain  = "api.gratzi.io"
+      app_name     = "gratzi-io"
+      github_repo  = "smzelek/gratzi.io"
+      app_domain   = "gratzi.io"
+      api_domain   = "api.gratzi.io"
       subdomain_of = ""
-      bootstrap   = false
+      bootstrap    = false
     },
     {
       app_name     = "guildvaults-com"
@@ -106,6 +106,7 @@ module "haproxy" {
   vpc_id                = module.cluster.vpc_id
   public_subnet_id      = module.cluster.public_subnet_id
   ecs_security_group_id = module.cluster.ecs_security_group_id
+  email_alert_topic_arn = aws_sns_topic.email_alerts.arn
 }
 
 module "app" {
@@ -131,6 +132,7 @@ module "app" {
   cluster_arn                    = module.cluster.cluster_arn
   cluster_name                   = module.cluster.cluster_name
   autoscaling_group_name         = module.cluster.autoscaling_group_name
+  haproxy_instance_id            = module.haproxy.haproxy_instance_id
   vpc_id                         = module.cluster.vpc_id
   service_discovery_namespace_id = module.cluster.service_discovery_namespace_id
   capacity_provider_name         = module.cluster.capacity_provider_name
@@ -159,12 +161,6 @@ data "aws_instances" "asg_instances" {
   }
 }
 
-data "aws_instances" "haproxy_instance" {
-  instance_tags = {
-    Name = "haproxy"
-  }
-}
-
 output "app_links" {
   value = {
     for app in local.apps : app.app_name => {
@@ -190,7 +186,7 @@ output "asg_instance_ids" {
 
 output "haproxy_instance_id" {
   depends_on = [module.haproxy]
-  value      = data.aws_instances.haproxy_instance.ids
+  value      = module.haproxy.haproxy_instance_id
 }
 
 output "haproxy_domain" {

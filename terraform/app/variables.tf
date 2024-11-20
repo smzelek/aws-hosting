@@ -19,6 +19,10 @@ variable "autoscaling_group_name" {
   type = string
 }
 
+variable "haproxy_instance_id" {
+  type = string
+}
+
 variable "vpc_id" {
   type = string
 }

@@ -2,9 +2,9 @@
     "widgets": [
         {
             "height": 8,
-            "width": 7,
+            "width": 6,
             "y": 2,
-            "x": 7,
+            "x": 0,
             "type": "metric",
             "properties": {
                 "metrics": [
@@ -69,8 +69,8 @@
         {
             "height": 4,
             "width": 7,
-            "y": 2,
-            "x": 14,
+            "y": 10,
+            "x": 0,
             "type": "metric",
             "properties": {
                 "metrics": [
@@ -100,8 +100,6 @@
                 "region": "us-east-1",
                 "period": 300,
                 "stat": "Average",
-                "start": "-PT5M",
-                "end": "P0D",
                 "title": "ASG Capacity Rules",
                 "liveData": true
             }
@@ -109,8 +107,8 @@
         {
             "height": 4,
             "width": 7,
-            "y": 6,
-            "x": 14,
+            "y": 10,
+            "x": 7,
             "type": "metric",
             "properties": {
                 "metrics": [
@@ -142,16 +140,15 @@
                 "region": "us-east-1",
                 "period": 300,
                 "stat": "Average",
-                "start": "-PT5M",
-                "end": "P0D",
-                "liveData": true
+                "liveData": true,
+                "title": "ASG Desired Capacity"
             }
         },
         {
             "height": 8,
-            "width": 7,
+            "width": 6,
             "y": 2,
-            "x": 0,
+            "x": 6,
             "type": "metric",
             "properties": {
                 "view": "timeSeries",
@@ -191,13 +188,7 @@
                             "fill": "above"
                         }
                     ],
-                    "vertical": [
-                        {
-                            "visible": false,
-                            "label": "Untitled annotation",
-                            "value": "2024-05-01T14:42:04.000Z"
-                        }
-                    ]
+                    "vertical": []
                 },
                 "title": "ASG Instance Utilization"
             }
@@ -209,14 +200,14 @@
             "x": 0,
             "type": "text",
             "properties": {
-                "markdown": "# []()\n# Cluster ASG Metrics",
+                "markdown": "# []()\n# Cluster Metrics",
                 "background": "transparent"
             }
         },
         {
             "height": 2,
             "width": 21,
-            "y": 10,
+            "y": 14,
             "x": 0,
             "type": "text",
             "properties": {
@@ -226,8 +217,8 @@
         },
         {
             "height": 8,
-            "width": 7,
-            "y": 12,
+            "width": 6,
+            "y": 16,
             "x": 0,
             "type": "metric",
             "properties": {
@@ -279,35 +270,32 @@
         },
         {
             "height": 8,
-            "width": 7,
-            "y": 12,
-            "x": 7,
+            "width": 6,
+            "y": 16,
+            "x": 6,
             "type": "metric",
             "properties": {
                 "metrics": [
                     [
-                        "ECS/ContainerInsights",
-                        "RunningTaskCount",
-                        "ServiceName",
+                        "TelegrafMetrics",
+                        "service_task_status_gauge",
+                        "service",
                         "${template_service}",
-                        "ClusterName",
-                        "${template_cluster}",
+                        "state",
+                        "up",
                         {
+                            "label": "Running",
                             "region": "us-east-1",
-                            "label": "Running"
+                            "color": "#1f77b4"
                         }
                     ],
                     [
-                        ".",
-                        "PendingTaskCount",
-                        ".",
-                        ".",
-                        ".",
-                        ".",
+                        "...",
+                        "down",
                         {
+                            "label": "Missing",
                             "region": "us-east-1",
-                            "label": "Pending",
-                            "color": "#ffbb78"
+                            "color": "#d62728"
                         }
                     ]
                 ],
@@ -316,175 +304,22 @@
                 "region": "us-east-1",
                 "period": 300,
                 "stat": "Average",
-                "title": "Task Status"
+                "title": "Service Task Status",
+                "annotations": {
+                    "horizontal": [
+                        {
+                            "label": "SLA",
+                            "value": 1
+                        }
+                    ]
+                }
             }
         },
         {
             "height": 8,
-            "width": 7,
-            "y": 12,
-            "x": 14,
-            "type": "metric",
-            "properties": {
-                "metrics": [
-                    [
-                        "AWS/ApplicationELB",
-                        "HealthyHostCount",
-                        "TargetGroup",
-                        "${template_target_group}",
-                        "LoadBalancer",
-                        "${template_lb}",
-                        {
-                            "region": "us-east-1",
-                            "color": "#2ca02c",
-                            "label": "Healthy"
-                        }
-                    ],
-                    [
-                        ".",
-                        "UnHealthyHostCount",
-                        ".",
-                        ".",
-                        ".",
-                        ".",
-                        {
-                            "region": "us-east-1",
-                            "color": "#d62728",
-                            "label": "Unhealthy"
-                        }
-                    ]
-                ],
-                "view": "timeSeries",
-                "stacked": false,
-                "region": "us-east-1",
-                "period": 300,
-                "stat": "Average",
-                "title": "Target Group Status"
-            }
-        },
-        {
-            "height": 2,
-            "width": 21,
-            "y": 28,
+            "width": 24,
+            "y": 24,
             "x": 0,
-            "type": "text",
-            "properties": {
-                "markdown": "# []()\n# []()",
-                "background": "transparent"
-            }
-        },
-        {
-            "height": 8,
-            "width": 7,
-            "y": 20,
-            "x": 0,
-            "type": "metric",
-            "properties": {
-                "metrics": [
-                    [
-                        "AWS/ApplicationELB",
-                        "RequestCount",
-                        "TargetGroup",
-                        "${template_target_group}",
-                        "LoadBalancer",
-                        "${template_lb}",
-                        {
-                            "label": "NumRequests",
-                            "color": "#1f77b4",
-                            "region": "us-east-1"
-                        }
-                    ],
-                    [
-                        ".",
-                        "HTTPCode_Target_2XX_Count",
-                        ".",
-                        ".",
-                        ".",
-                        ".",
-                        {
-                            "region": "us-east-1",
-                            "label": "2XX",
-                            "color": "#2ca02c"
-                        }
-                    ],
-                    [
-                        ".",
-                        "HTTPCode_Target_3XX_Count",
-                        ".",
-                        ".",
-                        ".",
-                        ".",
-                        {
-                            "region": "us-east-1",
-                            "label": "3XX",
-                            "color": "#ffbb78"
-                        }
-                    ],
-                    [
-                        ".",
-                        "HTTPCode_Target_4XX_Count",
-                        ".",
-                        ".",
-                        ".",
-                        ".",
-                        {
-                            "region": "us-east-1",
-                            "label": "4XX"
-                        }
-                    ]
-                ],
-                "view": "timeSeries",
-                "stacked": false,
-                "region": "us-east-1",
-                "stat": "Average",
-                "period": 300,
-                "title": "API Requests"
-            }
-        },
-        {
-            "height": 8,
-            "width": 7,
-            "y": 20,
-            "x": 7,
-            "type": "metric",
-            "properties": {
-                "metrics": [
-                    [
-                        "AWS/ApplicationELB",
-                        "TargetResponseTime",
-                        "TargetGroup",
-                        "${template_target_group}",
-                        "LoadBalancer",
-                        "${template_lb}",
-                        {
-                            "label": "Response Time (s)"
-                        }
-                    ]
-                ],
-                "view": "timeSeries",
-                "stacked": false,
-                "region": "us-east-1",
-                "stat": "Average",
-                "period": 300,
-                "yAxis": {
-                    "left": {
-                        "label": "",
-                        "showUnits": true,
-                        "min": 0,
-                        "max": 1
-                    },
-                    "right": {
-                        "showUnits": false
-                    }
-                },
-                "title": "API Response Time"
-            }
-        },
-        {
-            "height": 8,
-            "width": 10,
-            "y": 20,
-            "x": 14,
             "type": "log",
             "properties": {
                 "query": "SOURCE '${template_log_group}' \n | fields @timestamp, @message \n | sort @timestamp desc \n | limit 100",
@@ -492,6 +327,167 @@
                 "stacked": false,
                 "view": "table",
                 "title": "Latest API Logs"
+            }
+        },
+        {
+            "height": 8,
+            "width": 6,
+            "y": 2,
+            "x": 12,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [
+                        {
+                            "expression": "100*(m2/m1)",
+                            "label": "MemoryUtilization",
+                            "id": "e1",
+                            "period": 20,
+                            "region": "us-east-1",
+                            "color": "#1f77b4"
+                        }
+                    ],
+                    [
+                        "TelegrafMetrics",
+                        "memory_utilization_total",
+                        "instance_id",
+                        "${template_haproxy_instance_id}",
+                        {
+                            "id": "m1",
+                            "visible": false,
+                            "region": "us-east-1"
+                        }
+                    ],
+                    [
+                        ".",
+                        "memory_utilization_used",
+                        ".",
+                        ".",
+                        {
+                            "id": "m2",
+                            "visible": false,
+                            "region": "us-east-1"
+                        }
+                    ],
+                    [
+                        "AWS/EC2",
+                        "CPUUtilization",
+                        "InstanceId",
+                        ".",
+                        {
+                            "id": "m3",
+                            "label": "CPUUtilization",
+                            "region": "us-east-1",
+                            "color": "#ff7f0e"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-east-1",
+                "stat": "Average",
+                "period": 20,
+                "title": "HAProxy Instance Utilization",
+                "annotations": {
+                    "horizontal": [
+                        {
+                            "label": "SLA",
+                            "value": 90,
+                            "fill": "above"
+                        }
+                    ]
+                },
+                "yAxis": {
+                    "left": {
+                        "max": 100,
+                        "min": 0
+                    }
+                }
+            }
+        },
+        {
+            "height": 8,
+            "width": 6,
+            "y": 16,
+            "x": 12,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [
+                        "TelegrafMetrics",
+                        "response_status_counts_counter",
+                        "code",
+                        "2xx",
+                        "service",
+                        "${template_service}",
+                        {
+                            "color": "#2ca02c"
+                        }
+                    ],
+                    [
+                        "...",
+                        "3xx",
+                        ".",
+                        ".",
+                        {
+                            "color": "#1f77b4"
+                        }
+                    ],
+                    [
+                        "...",
+                        "4xx",
+                        ".",
+                        ".",
+                        {
+                            "color": "#ff7f0e"
+                        }
+                    ],
+                    [
+                        "...",
+                        "5xx",
+                        ".",
+                        "."
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-east-1",
+                "stat": "Average",
+                "period": 300,
+                "title": "API Responses By Status"
+            }
+        },
+        {
+            "height": 8,
+            "width": 6,
+            "y": 16,
+            "x": 18,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [
+                        "TelegrafMetrics",
+                        "haproxy_backend_response_time_average_seconds_gauge",
+                        "service",
+                        "${template_service}",
+                        {
+                            "region": "us-east-1",
+                            "label": "Response Time (sec)"
+                        }
+                    ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "us-east-1",
+                "title": "API Response Time",
+                "period": 300,
+                "stat": "Average",
+                "yAxis": {
+                    "left": {
+                        "min": 0,
+                        "max": 0.5
+                    }
+                }
             }
         }
     ]

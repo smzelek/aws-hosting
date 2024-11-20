@@ -138,3 +138,66 @@ resource "aws_cloudwatch_log_group" "haproxy" {
 resource "aws_eip" "haproxy_ip" {
   instance = aws_instance.haproxy.id
 }
+resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
+  alarm_name          = "haproxy-cpu-alarm"
+  namespace           = "AWS/EC2"
+  metric_name         = "CPUUtilization"
+  statistic           = "Average"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 90
+  period              = 60
+  evaluation_periods  = 5
+  treat_missing_data  = "breaching"
+  datapoints_to_alarm = 5
+  alarm_actions       = [var.email_alert_topic_arn]
+  ok_actions          = [var.email_alert_topic_arn]
+  dimensions = {
+    InstanceId = aws_instance.haproxy.id
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "memory_alarm" {
+  alarm_name = "haproxy-memory-alarm"
+
+  metric_query {
+    id          = "m1"
+    metric {
+      namespace   = "TelegrafMetrics"
+      metric_name = "memory_utilization_total"
+      stat        = "Average"
+      period      = 60
+
+      dimensions = {
+        instance_id = aws_instance.haproxy.id
+      }
+    }
+  }
+  metric_query {
+    id          = "m2"
+    metric {
+      namespace   = "TelegrafMetrics"
+      metric_name = "memory_utilization_used"
+      stat        = "Average"
+      period      = 60
+
+      dimensions = {
+        instance_id = aws_instance.haproxy.id
+      }
+    }
+  }
+  metric_query {
+    label       = "MemoryUtilization"
+    expression  = "100*(m2/m1)"
+    id          = "e1"
+    return_data = true
+  }
+
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 90
+  evaluation_periods  = 5
+  treat_missing_data  = "breaching"
+  datapoints_to_alarm = 5
+
+  alarm_actions = [var.email_alert_topic_arn]
+  ok_actions    = [var.email_alert_topic_arn]
+}

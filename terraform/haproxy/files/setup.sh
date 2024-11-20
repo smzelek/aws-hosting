@@ -8,29 +8,31 @@ set -o pipefail
 BLUE="\033[1;34m"
 NC="\033[0m"
 
+echo -e "${BLUE}Setting up telegraf install source:${NC}"
+cat <<EOF | sudo tee /etc/yum.repos.d/influxdata.repo
+[influxdata]
+name = InfluxData Repository - Stable
+baseurl = https://repos.influxdata.com/stable/\$basearch/main
+enabled = 1
+gpgcheck = 1
+gpgkey = https://repos.influxdata.com/influxdata-archive_compat.key
+EOF
+
 echo -e "${BLUE}Installing haproxy dependencies:${NC}"
 sudo yum install -y \
     bind-utils \
     haproxy \
     nano \
     rsyslog \
-    amazon-cloudwatch-agent
+    amazon-cloudwatch-agent \
+    telegraf
 echo -e "\n"
 
-# echo -e "${BLUE}Installing telegraf:${NC}"
-# cat <<EOF | sudo tee /etc/yum.repos.d/influxdata.repo
-# [influxdata]
-# name = InfluxData Repository - Stable
-# baseurl = https://repos.influxdata.com/stable/\$basearch/main
-# enabled = 1
-# gpgcheck = 1
-# gpgkey = https://repos.influxdata.com/influxdata-archive_compat.key
-# EOF
-
-# sudo yum install -y telegraf
-# sudo service telegraf start
-
-cd ~
+# Needed by the telegraf config
+sudo sh -c "echo EC2_INSTANCE_ID=$(ec2-metadata --instance-id  | cut -d " " -f 2) > /etc/default/telegraf"
+sudo cp ~/telegraf.conf /etc/telegraf/telegraf.conf
+cat /etc/telegraf/telegraf.conf
+echo -e "\n"
 
 echo -e "${BLUE}Setting up haproxy config file:${NC}"
 sudo cp ~/haproxy.cfg /etc/haproxy/haproxy.cfg
@@ -57,6 +59,7 @@ echo -e "\n"
 echo -e "${BLUE}Restarting services:${NC}"
 sudo service rsyslog restart
 sudo service haproxy restart
+sudo service telegraf restart
 echo -e "\n"
 
 echo -e "${BLUE}Done.${NC}"
