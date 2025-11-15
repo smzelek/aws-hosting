@@ -19,6 +19,14 @@ provider "aws" {
 locals {
   apps = [
     {
+      app_name     = "learnderby-com"
+      github_repo  = "smzelek/learnderby.com"
+      app_domain   = "learnderby.com"
+      api_domain   = "api.learnderby.com"
+      subdomain_of = ""
+      bootstrap    = true
+    },
+    {
       app_name     = "gratzi-io"
       github_repo  = "smzelek/gratzi.io"
       app_domain   = "gratzi.io"

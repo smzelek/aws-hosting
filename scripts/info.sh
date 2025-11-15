@@ -14,5 +14,6 @@ set -o pipefail
 # verify identity
 aws sts get-caller-identity --query "Account" > /dev/null || aws sso login
 
+terraform -chdir=terraform init
 terraform -chdir=terraform/ apply -refresh-only
 # terraform -chdir=terraform/ output

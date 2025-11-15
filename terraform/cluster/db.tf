@@ -27,7 +27,7 @@ resource "aws_db_instance" "default" {
   apply_immediately            = true
   storage_type                 = "gp3"
   engine                       = "postgres"
-  engine_version               = "16.3"
+  engine_version               = "16.8"
   instance_class               = "db.t4g.micro"
   identifier                   = "cluster-db"
   username                     = "postgres"
