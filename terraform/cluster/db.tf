@@ -27,7 +27,7 @@ resource "aws_db_instance" "default" {
   apply_immediately            = true
   storage_type                 = "gp3"
   engine                       = "postgres"
-  engine_version               = "16.8"
+  engine_version               = "18.1"
   instance_class               = "db.t4g.micro"
   identifier                   = "cluster-db"
   username                     = "postgres"
@@ -41,7 +41,7 @@ resource "aws_db_instance" "default" {
   skip_final_snapshot          = true
   performance_insights_enabled = true
   storage_encrypted            = true
-  parameter_group_name         = "default.postgres16"
+  parameter_group_name         = "default.postgres18"
   copy_tags_to_snapshot        = true
   multi_az                     = false
 }

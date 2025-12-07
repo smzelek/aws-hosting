@@ -16,9 +16,11 @@ TARGET="${1}" # aws instance ID, aka `i-11010101010101`
 aws sts get-caller-identity --query "Account" > /dev/null || aws sso login
 
 if [[ "${TARGET}" == "haproxy" ]]; then
-    INSTANCE_ID="$(terraform -chdir=terraform/ output --json | jq -r '.haproxy_instance_id.value[0]')"
+    TF_OUTPUT="$(terraform -chdir=terraform/ output --json)"
+    INSTANCE_ID="$(echo $TF_OUTPUT | jq -r '.haproxy_instance_id.value')"
 elif [[ "${TARGET}" == "cluster" ]]; then
-    INSTANCE_ID="$(terraform -chdir=terraform/ output --json | jq -r '.asg_instance_ids.value[0]')"
+    TF_OUTPUT="$(terraform -chdir=terraform/ output --json)"
+    INSTANCE_ID="$(echo $TF_OUTPUT | jq -r '.asg_instance_ids.value')"
 else
     INSTANCE_ID="${TARGET}"
 fi
