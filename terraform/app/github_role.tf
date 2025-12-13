@@ -63,7 +63,8 @@ resource "aws_iam_role_policy" "github_role_policy" {
         Effect = "Allow",
         Action = [
           "ecs:RunTask",
-          "ecs:TagResource"
+          "ecs:TagResource",
+          "ecs:RegisterTaskDefinition",
         ],
         Resource = ["${aws_ecs_task_definition.command_task_definition.arn_without_revision}:*"]
       },
