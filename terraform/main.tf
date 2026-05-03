@@ -85,6 +85,12 @@ locals {
       app_domain   = "takemeapart.com"
       subdomain_of = ""
     },
+    {
+      app_name = "canyoulearnmusic-com"
+      github_repo = "smzelek/canyoulearnmusic.com"
+      app_domain   = "canyoulearnmusic.com"
+      subdomain_of = ""
+    }
   ]
 }
 

@@ -37,8 +37,8 @@ bash ./scripts/db_tunnel.sh
 ### Renew certs
 ```bash
 # per-domain
-dig txt _acme-challenge.ticmetactoe.com @8.8.8.8
 bash scripts/make_cert.sh ticmetactoe.com
+dig txt _acme-challenge.ticmetactoe.com @8.8.8.8
 
 # finally
 bash scripts/upload.sh
@@ -50,18 +50,18 @@ bash scripts/upload.sh
 3. Add the two TXT entries in Cloudflare
 4. Add entry in `terraform/main.tf` with `bootstrap` true for the first run
 5. Add entries in `terraform/haproxy/files/haproxy.cfg`
-6. Run `bash scripts/apply.sh`
+6. Run `AWS_PROFILE=kerukion-admin bash scripts/apply.sh`
 7. `apply` will hang on validating -- get validation CNAME [here](https://us-east-1.console.aws.amazon.com/acm/home?region=us-east-1#/certificates/list)
 8. Add validation CNAME to Cloudflare (DNS only)
-9. `apply` should pick up the valid CNAME; re-run if needed
+9. `apply` should pick up the valid CNAME after ~2-3 mins; re-run if needed
 10. Change `bootstrap = false` for the future
 11. Copy `cloudfront_domain` into Cloudflare as `@` CNAME (DNS only)
 12. Copy `cloudfront_domain` into Cloudflare as `www` CNAME (DNS only)
 13. Copy `haproxy_domain` into Cloudflare as `api` CNAME (DNS only)
-14. Run `bash scripts/upload.sh`
-15. Run `bash scripts/ssh.sh haproxy`
+14. Run `AWS_PROFILE=kerukion-admin bash scripts/upload.sh`
+15. Run `AWS_PROFILE=kerukion-admin bash scripts/ssh.sh haproxy`
 16. Run `cd ~ && aws s3 sync s3://kerukion-haproxy-config/ ~`
-17. Run `bash ~/setup.sh`
+17. Run `AWS_PROFILE=kerukion-admin bash ~/setup.sh`
 18. Add secrets at `secrets_link`
 19. Add ci/cd jobs to Github Repo, deploys are now automatic (https://github.com/smzelek/aws-hosting/tree/main/.github/workflows)
 20. Add `CLOUDFLARE_TOKEN` to Github Repo secrets, modify CI/CD Jobs to include AWS App name
