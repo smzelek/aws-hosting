@@ -61,7 +61,7 @@ bash scripts/upload.sh
 14. Run `AWS_PROFILE=kerukion-admin bash scripts/upload.sh`
 15. Run `AWS_PROFILE=kerukion-admin bash scripts/ssh.sh haproxy`
 16. Run `cd ~ && aws s3 sync s3://kerukion-haproxy-config/ ~`
-17. Run `AWS_PROFILE=kerukion-admin bash ~/setup.sh`
+17. Run `bash ~/setup.sh`
 18. Add secrets at `secrets_link`
 19. Add ci/cd jobs to Github Repo, deploys are now automatic (https://github.com/smzelek/aws-hosting/tree/main/.github/workflows)
 20. Add `CLOUDFLARE_TOKEN` to Github Repo secrets, modify CI/CD Jobs to include AWS App name

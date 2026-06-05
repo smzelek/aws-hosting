@@ -14,3 +14,7 @@ variable "email_alert_topic_arn" {
   type = string
 }
 
+variable "cert_domains" {
+  type = list(string)
+}
+

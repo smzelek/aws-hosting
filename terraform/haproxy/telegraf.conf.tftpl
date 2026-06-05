@@ -1,7 +1,7 @@
 # telegraf --config ./telegraf.conf --debug --test
 
-[agent] 
-  hostname = "haproxy" 
+[agent]
+  hostname = "haproxy"
   interval = "15s"
   quiet = false
 
@@ -11,6 +11,16 @@
 [[outputs.cloudwatch]]
   region = "us-east-1"
   namespace = "TelegrafMetrics"
+
+[[inputs.x509_cert]]
+  interval = "1h"
+  sources = [
+%{ for domain in cert_domains ~}
+    "https://${domain}",
+%{ endfor ~}
+  ]
+  fieldpass = ["expiry"]
+  taginclude = ["source"]
 
 [[inputs.mem]]
   fieldpass = ["used", "total"]
@@ -62,7 +72,7 @@ def apply(metric):
 
     state[site] = { "UP": 0, "DOWN": 0, "TOTAL": 0 }
     metrics = [down, up]
-  
+
   state[site]["TOTAL"] += current
   if status == "UP":
     state[site]["UP"] += current
@@ -99,8 +109,7 @@ def apply(metric):
   [[processors.rename.replace]]
     measurement = "mem"
     dest = "memory_utilization"
-    
+
   [[processors.rename.replace]]
     tag = "proxy"
     dest = "service"
-    

@@ -130,6 +130,14 @@ resource "aws_s3_bucket" "haproxy_config" {
   bucket = "kerukion-haproxy-config"
 }
 
+resource "aws_s3_object" "telegraf_conf" {
+  bucket  = aws_s3_bucket.haproxy_config.bucket
+  key     = "telegraf.conf"
+  content = templatefile("${path.module}/telegraf.conf.tftpl", {
+    cert_domains = var.cert_domains
+  })
+}
+
 resource "aws_cloudwatch_log_group" "haproxy" {
   name              = "haproxy"
   retention_in_days = 365
@@ -197,6 +205,28 @@ resource "aws_cloudwatch_metric_alarm" "memory_alarm" {
   evaluation_periods  = 5
   treat_missing_data  = "breaching"
   datapoints_to_alarm = 5
+
+  alarm_actions = [var.email_alert_topic_arn]
+  ok_actions    = [var.email_alert_topic_arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "cert_expiry" {
+  for_each = toset(var.cert_domains)
+
+  alarm_name          = "cert-expiry-${replace(each.key, ".", "-")}"
+  namespace           = "TelegrafMetrics"
+  metric_name         = "x509_cert_expiry"
+  statistic           = "Minimum"
+  comparison_operator = "LessThanThreshold"
+  threshold           = 2592000 # 30 days in seconds
+  period              = 3600
+  evaluation_periods  = 1
+  treat_missing_data  = "breaching"
+  datapoints_to_alarm = 1
+
+  dimensions = {
+    source = "https://${each.key}"
+  }
 
   alarm_actions = [var.email_alert_topic_arn]
   ok_actions    = [var.email_alert_topic_arn]

@@ -24,22 +24,6 @@ locals {
       app_domain   = "learnderby.com"
       api_domain   = "api.learnderby.com"
       subdomain_of = ""
-      bootstrap    = true
-    },
-    {
-      app_name     = "gratzi-io"
-      github_repo  = "smzelek/gratzi.io"
-      app_domain   = "gratzi.io"
-      api_domain   = "api.gratzi.io"
-      subdomain_of = ""
-      bootstrap    = false
-    },
-    {
-      app_name     = "guildvaults-com"
-      github_repo  = "smzelek/guildvaults.com"
-      app_domain   = "guildvaults.com"
-      api_domain   = "api.guildvaults.com"
-      subdomain_of = ""
       bootstrap    = false
     },
     {
@@ -50,15 +34,13 @@ locals {
       subdomain_of = ""
       bootstrap    = false
     },
-    {
-      app_name     = "raidtimers-com"
-      github_repo  = "smzelek/raidtimers.com"
-      app_domain   = "raidtimers.com"
-      api_domain   = "api.raidtimers.com"
-      subdomain_of = ""
-      bootstrap    = false
-    },
   ]
+
+  cert_domains = concat(
+    [for app in local.apps : app.subdomain_of == "" ? app.app_domain : "${app.app_domain}.${app.subdomain_of}"],
+    [for app in local.apps : app.subdomain_of == "" ? app.api_domain : "${app.api_domain}.${app.subdomain_of}" if app.api_domain != ""],
+    [for app in local.static_apps : app.subdomain_of == "" ? app.app_domain : "${app.app_domain}.${app.subdomain_of}"],
+  )
 
   static_apps = [
     {
@@ -86,8 +68,8 @@ locals {
       subdomain_of = ""
     },
     {
-      app_name = "canyoulearnmusic-com"
-      github_repo = "smzelek/canyoulearnmusic.com"
+      app_name     = "canyoulearnmusic-com"
+      github_repo  = "smzelek/canyoulearnmusic.com"
       app_domain   = "canyoulearnmusic.com"
       subdomain_of = ""
     }
@@ -121,6 +103,7 @@ module "haproxy" {
   public_subnet_id      = module.cluster.public_subnet_id
   ecs_security_group_id = module.cluster.ecs_security_group_id
   email_alert_topic_arn = aws_sns_topic.email_alerts.arn
+  cert_domains          = local.cert_domains
 }
 
 module "app" {
