@@ -9,13 +9,13 @@ brew install terraform
 
 brew install certbot
 
-bash scripts/info.sh
+AWS_PROFILE=kerukion-admin bash scripts/info.sh
 ```
 
 ## Instructions
 ### Start local CLI ssh session on instance
 ```bash
-bash ./scripts/ssh.sh <instance_id>
+AWS_PROFILE=kerukion-admin bash ./scripts/ssh.sh <instance_id>
 ```
 
 ### Build and push docker default-image
@@ -30,7 +30,7 @@ sudo docker push "${ECR_TAG}")
 
 ### Connect to RDS DB
 ```bash
-bash ./scripts/db_tunnel.sh
+AWS_PROFILE=kerukion-admin bash ./scripts/db_tunnel.sh
 # open PGAdmin and connect to 127.0.0.1:9999
 ```
 
@@ -41,7 +41,7 @@ bash scripts/make_cert.sh ticmetactoe.com
 dig txt _acme-challenge.ticmetactoe.com @8.8.8.8
 
 # finally
-bash scripts/upload.sh
+AWS_PROFILE=kerukion-admin bash scripts/upload.sh
 ```
 
 ## Creating a new app

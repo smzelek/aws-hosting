@@ -18,7 +18,7 @@ aws s3 sync terraform/haproxy/files s3://kerukion-haproxy-config/
 
 echo
 echo "Rerun haproxy setup:"
-echo "bash scripts/ssh.sh haproxy"
+echo "AWS_PROFILE=kerukion-admin bash scripts/ssh.sh haproxy"
 echo "cd ~ && aws s3 sync s3://kerukion-haproxy-config/ ~"
 echo "bash ~/setup.sh"
 echo
