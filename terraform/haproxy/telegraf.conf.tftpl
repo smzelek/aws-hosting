@@ -27,7 +27,7 @@
   tagexclude = ["host"]
 
   [inputs.mem.tags]
-    instance_id="${EC2_INSTANCE_ID}"
+    instance_id="$${EC2_INSTANCE_ID}"
 
 [[inputs.prometheus]]
   urls = ["http://localhost:8405/metrics"]

@@ -65,3 +65,10 @@ AWS_PROFILE=kerukion-admin bash scripts/upload.sh
 18. Add secrets at `secrets_link`
 19. Add ci/cd jobs to Github Repo, deploys are now automatic (https://github.com/smzelek/aws-hosting/tree/main/.github/workflows)
 20. Add `CLOUDFLARE_TOKEN` to Github Repo secrets, modify CI/CD Jobs to include AWS App name
+
+## Creating a new subdomain app
+1. Add entry in `terraform/main.tf`, apply
+2. Copy `cloudfront_domain` into Cloudflare as subdomain under main domain DNS
+    * i.e. take-me-apart.stevezelek.com CNAME d18utdo1nyh57n.cloudfront.net Proxied
+3. Add ci/cd jobs to Github Repo, deploys are now automatic (https://github.com/smzelek/aws-hosting/tree/main/.github/workflows)
+

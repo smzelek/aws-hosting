@@ -124,8 +124,15 @@ resource "aws_iam_role_policy" "github_role_policy" {
         Effect = "Allow",
         Action = [
           "s3:PutObject",
+          "s3:GetObject",
         ],
         Resource = ["${aws_s3_bucket.default.arn}/*"]
+      },
+      {
+        # Without ListBucket, S3 reports a missing object as 403 instead of 404.
+        Effect = "Allow",
+        Action = ["s3:ListBucket"],
+        Resource = [aws_s3_bucket.default.arn]
       },
     ]
   })

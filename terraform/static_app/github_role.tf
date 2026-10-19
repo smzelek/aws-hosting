@@ -52,10 +52,14 @@ resource "aws_iam_role_policy" "github_role_policy" {
         Effect = "Allow",
         Action = [
           "s3:PutObject",
-          "s3:ListBucket",
           "s3:GetObject",
         ],
         Resource = ["${aws_s3_bucket.default.arn}/*"]
+      },
+      {
+        Effect = "Allow",
+        Action = ["s3:ListBucket"],
+        Resource = [aws_s3_bucket.default.arn]
       },
     ]
   })

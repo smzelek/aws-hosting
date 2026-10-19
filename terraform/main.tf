@@ -44,6 +44,12 @@ locals {
 
   static_apps = [
     {
+      app_name     = "scoreboard"
+      github_repo  = "smzelek/learnderby.com"
+      app_domain   = "scoreboard"
+      subdomain_of = "learnderby.com"
+    },
+    {
       app_name     = "stevezelek-com"
       github_repo  = "smzelek/stevezelek.com"
       app_domain   = "stevezelek.com"
@@ -65,12 +71,6 @@ locals {
       app_name     = "takemeapart-com"
       github_repo  = "smzelek/takemeapart.com"
       app_domain   = "takemeapart.com"
-      subdomain_of = ""
-    },
-    {
-      app_name     = "canyoulearnmusic-com"
-      github_repo  = "smzelek/canyoulearnmusic.com"
-      app_domain   = "canyoulearnmusic.com"
       subdomain_of = ""
     }
   ]
