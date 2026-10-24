@@ -60,7 +60,7 @@ AWS_PROFILE=kerukion-admin bash scripts/upload.sh
 13. Copy `haproxy_domain` into Cloudflare as `api` CNAME (DNS only)
 14. Run `AWS_PROFILE=kerukion-admin bash scripts/upload.sh`
 15. Run `AWS_PROFILE=kerukion-admin bash scripts/ssh.sh haproxy`
-16. Run `cd ~ && aws s3 sync s3://kerukion-haproxy-config/ ~`
+16. Run `cd ~ && aws s3 cp --recursive s3://kerukion-haproxy-config/ ~`
 17. Run `bash ~/setup.sh`
 18. Add secrets at `secrets_link`
 19. Add ci/cd jobs to Github Repo, deploys are now automatic (https://github.com/smzelek/aws-hosting/tree/main/.github/workflows)
@@ -69,6 +69,6 @@ AWS_PROFILE=kerukion-admin bash scripts/upload.sh
 ## Creating a new subdomain app
 1. Add entry in `terraform/main.tf`, apply
 2. Copy `cloudfront_domain` into Cloudflare as subdomain under main domain DNS
-    * i.e. take-me-apart.stevezelek.com CNAME d18utdo1nyh57n.cloudfront.net Proxied
+    * i.e. `take-me-apart.stevezelek.com CNAME d18utdo1nyh57n.cloudfront.net Proxied`
 3. Add ci/cd jobs to Github Repo, deploys are now automatic (https://github.com/smzelek/aws-hosting/tree/main/.github/workflows)
 

@@ -225,7 +225,7 @@ resource "aws_cloudwatch_metric_alarm" "cert_expiry" {
   datapoints_to_alarm = 1
 
   dimensions = {
-    source = "https://${each.key}"
+    source = "https://${each.key}:443"
   }
 
   alarm_actions = [var.email_alert_topic_arn]

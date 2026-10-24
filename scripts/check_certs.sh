@@ -18,7 +18,6 @@ DOMAINS=(
     wow.stevezelek.com
     pokegrader.com
     takemeapart.com
-    canyoulearnmusic.com
 )
 
 for domain in "${DOMAINS[@]}"; do
